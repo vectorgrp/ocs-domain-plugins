@@ -1,0 +1,94 @@
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
+
+//rootProject.ext.sip.applyAutomationInterfacePlugin(project)
+apply from: rootProject.file ('gradle/dvCfgAutomationBootstrap.gradle')
+
+dvCfgAutomation {
+    includeDependenciesIntoJar = false
+    jarSigningEnabled = false
+}
+
+// Set dependencies to specific versions of the core api and the json api
+dependencies {
+    implementation "com.vector.ocs:ocs-core-api:$vOcsCore"
+    implementation "com.vector.ocs:ocs-json-api:$vOcsCore"
+    implementation "com.vector.ocs:ocs-sec:$vOcsCore"
+}
+
+// Define Groovy and kotlin structure as it is used in the individual plugin source folder
+sourceSets {
+    model {
+        kotlin
+    }
+    main {
+        compileClasspath += sourceSets.model.output
+        runtimeClasspath += sourceSets.model.output
+    }
+}
+
+configurations {
+    modelImplementation.extendsFrom implementation
+    modelRuntimeOnly.extendsFrom runtimeOnly
+    modelCompileOnly.extendsFrom compileOnly
+}
+
+// Declare tasks that are needed to compile the groovy and kotlin source code and to build the jar files
+tasks.named('jar') {
+    from sourceSets.model.output
+}
+
+tasks.named('compileGroovy') {
+    classpath = sourceSets.main.compileClasspath
+}
+tasks.named('compileKotlin') {
+    libraries.setFrom(libraries + files(sourceSets.main.groovy.classesDirectory))
+}
+
+// Declare all available domain plugins and their current version to be able to use it project wide
+ext.pluginVersions = [
+    'ocs-plugins-shared-lib': vPluginsCommon,
+    'ocs-communication-plugin': vOcsCom,
+    'ocs-diagnostics-plugin': vOcsDiag,
+    'ocs-ecustatemanagement-plugin': vOcsEcuState,
+    'ocs-nvmemory-plugin': vOcsNvM,
+    'ocs-runtimesystem-plugin': vOcsRuntime,
+    'ocs-security-plugin': vOcsSecurity
+]
+
+// Task for building all plugins that are in the original group of domain plugins (see enum above)
+tasks.register('buildAllPlugins') {
+    group = 'build'
+
+    pluginVersions.each { pluginName, version ->
+        dependsOn(":${pluginName}:build")
+    }
+}
+
+//-----------
+// PUBLISHING
+// ----------
+
+// Set the version of each plugin according to the provided version number in the enum above
+allprojects {
+    pluginVersions.each { pluginName, version ->
+        project(":" + pluginName.toString()).version = version
+    }
+}
+
+// include the maven publish plugin for later publishing to the local and remote maven repos
+apply plugin: 'maven-publish'
+
+// Declaring all the repositories that are possible targets when publishing the resulting plugin artifacts
+publishing {
+    repositories {
+        // The mavenLocal repository can be used as an alternative
+        mavenLocal()
+    }
+    publications {
+        maven(MavenPublication) {
+            version = rootProject.ext.publishVersion(project)
+            from components.java
+        }
+    }
+}

@@ -1,0 +1,16 @@
+rootProject.name = 'ocs-plugins'
+
+//Adding the plugins as project directories to include in the gradle build structure
+[
+    'ocs-plugins-shared-lib',
+    'ocs-communication-plugin',
+    'ocs-diagnostics-plugin',
+    'ocs-ecustatemanagement-plugin',
+    'ocs-nvmemory-plugin',
+    'ocs-runtimesystem-plugin',
+    'ocs-security-plugin'
+].each {
+    String name = ':' + it
+    include(name)
+    project(name).projectDir = file('plugins/' + it)
+}

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html lang="en">
+  <head>
+    <style>
+      body {
+        margin: 20px;
+        font-size: 11pt;
+        font-family: Tahoma, arial, sans-serif;
+        color: #000000;
+        background-color: #FFFFFF;
+        text-align: left;
+      }
+
+      h1 {
+        font-size: 20pt;
+        font-weight: normal;
+      }
+
+      h1 img {
+        vertical-align: bottom;
+        padding-bottom: 2px;
+      }
+
+      h2 {
+        height: 30px;
+        line-height: 30px;
+        text-align: left;
+        background-color: #E5E5E5;
+        font-size: 11pt;
+        font-weight: bold;
+      }
+
+      h3 {
+        font-size: 11pt;
+        padding-top: 5pt;
+        padding-left: 18pt;
+      }
+
+      table {
+        width: 100%;
+        border: 1px solid #E5E5E5;
+        margin-bottom: 15pt;
+        margin-top: 15pt;
+        border-spacing: 0;
+      }
+
+      li {
+        list-style-image: url("data:image/gif;base64,R0lGODlhCwAJAIcAAAAAAJCQkJCQo6OQkKOQo5CjyaOjycnt///tye3//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEBAAAh+QQBAAD/ACwAAAAACwAJAAAIMgARGEjwr6DBgggGBChA8OC/hAEiMjwIMaLEhhUtXswYUcABhAo7fjQI0aPDhwRGngwIADs=")
+      }
+
+      table.head {
+        width: 100%;
+        background-color: #E5E5E5;
+        border-color: White;
+        border-width: 0;
+        text-align: center;
+        color: #000000;
+      }
+
+
+      .VectorLogo {
+        width: 130px;
+      }
+
+      .caption {
+        height: 30px;
+        line-height: 30px;
+        text-align: left;
+        background-color: #E5E5E5;
+        font-size: 11pt;
+        font-weight: bold;
+      }
+
+      .where:before {
+        content: "Context: ";
+      }
+
+      .where {
+        font-size: 9pt;
+        font-style: normal;
+        display: block;
+        width: 65em;
+        padding-bottom: 5pt;
+      }
+
+      td,
+      th {
+        vertical-align: top;
+        border: 1px solid #E5E5E5;
+        border-spacing: 0;
+        font-size: 11pt;
+      }
+
+      .license-component-details {
+        font-weight: bold;
+      }
+
+    </style>
+    <title>OCS Domain Plugins - Third Party Software</title>
+  </head>
+
+  <body>
+    <table style="border: 0px; border-spacing: 2px;">
+      <tbody>
+        <tr>
+          <td style="border: 0px">
+            <h1><img
+                src="data:image/gif;base64,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"
+                alt="Vector Logo">&nbsp;&nbsp;&nbsp;
+              <span>OCS Domain Plugins - Third Party Software</span>
+            </h1>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>This Notice file represents the best efforts of Vector Informatik to list the Third-Party components and licenses used in this product.<br></p>
+    <p>If the license conditions allow it, you can request the source code (including changes) via support@vector.com.</p>
+     <p>This file is structured in the following parts:
+        </p>
+        <ul>
+          <li><a href="#Components">Components</a>: A list of all components with used versions and applicable licenses</li>
+          <li><a href="#Licenses">Licenses</a>: The full license texts of the applicable licenses</li>
+          <li><a href="#CopyAndNotice">Copyright Data and Notices</a></li>
+          
+        </ul>
+      <p>
+    </p>
+    <div class="col-md-12">
+      <h1 id="Components">Components</h1>
+      <table class="table backgrid notices-component-table">
+        <thead>
+          <tr>
+            <th scope="col" class="renderable">Component</th>
+            <th scope="col" class="renderable">License</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+                    <td class="renderable"><a href="#COM_12b84a96a17dfb8e8febc176c991ce0be6faeb764c896c9189b2a377339a01d3"><span class="project-version">
+                      <span class="project-name">Jetbrains annotations</span> <span class="version-name">13.0</span>
+                    </span></a></td>
+                    <td class="renderable">
+              <div class="license-name"><a href="#LIC_e99dd4b311146507c3d0a887ca12e50387fe644c8aaa86cb500b50c068062543">Apache License 2.0</a></div>
+            </td>
+            </tr><tr>
+                    <td class="renderable"><a href="#COM_50135249085f97a65c16497de6a295dd69000b974dc3d6cc36424075f1822400"><span class="project-version">
+                      <span class="project-name">Kotlin</span> <span class="version-name">1.9.24</span>
+                    </span></a></td>
+                    <td class="renderable">
+              <div class="license-name"><a href="#LIC_e99dd4b311146507c3d0a887ca12e50387fe644c8aaa86cb500b50c068062543">Apache License 2.0</a></div>
+            </td>
+            </tr><tr>
+                    <td class="renderable"><a href="#COM_e69b7ef0e1e2bc6b276b7b3ebb4698b5249fac4944a946da9d8887d4e395810c"><span class="project-version">
+                      <span class="project-name">kotlin-reflect</span> <span class="version-name">1.9.24</span>
+                    </span></a></td>
+                    <td class="renderable">
+              <div class="license-name"><a href="#LIC_e99dd4b311146507c3d0a887ca12e50387fe644c8aaa86cb500b50c068062543">Apache License 2.0</a></div>
+            </td>
+            </tr><tr>
+                    <td class="renderable"><a href="#COM_a39f78d5a38115f82119628cf5feb5d457d9b771f9da1913286299e58ecf813c"><span class="project-version">
+                      <span class="project-name">kotlin-stdlib-common</span> <span class="version-name">1.9.24</span>
+                    </span></a></td>
+                    <td class="renderable">
+              <div class="license-name"><a href="#LIC_e99dd4b311146507c3d0a887ca12e50387fe644c8aaa86cb500b50c068062543">Apache License 2.0</a></div>
+            </td>
+            </tr><tr>
+                    <td class="renderable"><a href="#COM_2f44d7f2b65334e5583bb7962cc190b5eb5eceec6b34779d787813d2a1db0377"><span class="project-version">
+                      <span class="project-name">kotlinx-serialization-bom</span> <span class="version-name">1.6.3</span>
+                    </span></a></td>
+                    <td class="renderable">
+              <div class="license-name"><a href="#LIC_e99dd4b311146507c3d0a887ca12e50387fe644c8aaa86cb500b50c068062543">Apache License 2.0</a></div>
+            </td>
+            </tr><tr>
+                    <td class="renderable"><a href="#COM_c5faaf094238f4caf7bafe5ae91436f14dcff7e1c234b078920588e4002fbd5c"><span class="project-version">
+                      <span class="project-name">kotlinx-serialization-core</span> <span class="version-name">1.6.3</span>
+                    </span></a></td>
+                    <td class="renderable">
+              <div class="license-name"><a href="#LIC_e99dd4b311146507c3d0a887ca12e50387fe644c8aaa86cb500b50c068062543">Apache License 2.0</a></div>
+            </td>
+            </tr><tr>
+                    <td class="renderable"><a href="#COM_15df2336274e09df251ddc3ff3d0ad306715b7c71f9ee43943fe3abb02d50711"><span class="project-version">
+                      <span class="project-name">kotlinx-serialization-json</span> <span class="version-name">1.6.3</span>
+                    </span></a></td>
+                    <td class="renderable">
+              <div class="license-name"><a href="#LIC_e99dd4b311146507c3d0a887ca12e50387fe644c8aaa86cb500b50c068062543">Apache License 2.0</a></div>
+            </td>
+            </tr>
+          <!--
+          <tr>
+            <td class="renderable"><span class="project-version"><span class="project-name">@angular/animations</span><span
+                  class="version-name">10.2.4</span></span></td>
+            <td class="renderable">
+              <div class="license-name">MIT License</div>
+            </td>
+          </tr>
+          -->
+        </tbody>
+      </table>
+      <h1 id="Licenses">Licenses</h1>
+      <h2 id="LIC_e99dd4b311146507c3d0a887ca12e50387fe644c8aaa86cb500b50c068062543">Apache License 2.0</h2>
+                <div class="license-component-details text-muted">Jetbrains annotations 13.0, Kotlin 1.9.24, kotlin-reflect 1.9.24, kotlin-stdlib-common 1.9.24, kotlinx-serialization-bom 1.6.3, kotlinx-serialization-core 1.6.3, kotlinx-serialization-json 1.6.3</div>
+                <pre>Apache License
+Version 2.0, January 2004
+=========================
+
+
+http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+"License" shall mean the terms and conditions for use, reproduction, and
+distribution as defined by Sections 1 through 9 of this document.
+
+"Licensor" shall mean the copyright owner or entity authorized by the copyright
+owner that is granting the License.
+
+"Legal Entity" shall mean the union of the acting entity and all other entities
+that control, are controlled by, or are under common control with that entity.
+For the purposes of this definition, "control" means (i) the power, direct or
+indirect, to cause the direction or management of such entity, whether by
+contract or otherwise, or (ii) ownership of fifty percent (50%) or more of the
+outstanding shares, or (iii) beneficial ownership of such entity.
+
+"You" (or "Your") shall mean an individual or Legal Entity exercising permissions
+granted by this License.
+
+"Source" form shall mean the preferred form for making modifications, including
+but not limited to software source code, documentation source, and configuration
+files.
+
+"Object" form shall mean any form resulting from mechanical transformation or
+translation of a Source form, including but not limited to compiled object code,
+generated documentation, and conversions to other media types.
+
+"Work" shall mean the work of authorship, whether in Source or Object form, made
+available under the License, as indicated by a copyright notice that is included
+in or attached to the work (an example is provided in the Appendix below).
+
+"Derivative Works" shall mean any work, whether in Source or Object form, that is
+based on (or derived from) the Work and for which the editorial revisions,
+annotations, elaborations, or other modifications represent, as a whole, an
+original work of authorship. For the purposes of this License, Derivative Works
+shall not include works that remain separable from, or merely link (or bind by
+name) to the interfaces of, the Work and Derivative Works thereof.
+
+"Contribution" shall mean any work of authorship, including the original version
+of the Work and any modifications or additions to that Work or Derivative Works
+thereof, that is intentionally submitted to Licensor for inclusion in the Work by
+the copyright owner or by an individual or Legal Entity authorized to submit on
+behalf of the copyright owner. For the purposes of this definition, "submitted"
+means any form of electronic, verbal, or written communication sent to the
+Licensor or its representatives, including but not limited to communication on
+electronic mailing lists, source code control systems, and issue tracking systems
+that are managed by, or on behalf of, the Licensor for the purpose of discussing
+and improving the Work, but excluding communication that is conspicuously marked
+or otherwise designated in writing by the copyright owner as "Not a
+Contribution."
+
+"Contributor" shall mean Licensor and any individual or Legal Entity on behalf of
+whom a Contribution has been received by Licensor and subsequently incorporated
+within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of this
+License, each Contributor hereby grants to You a perpetual, worldwide,
+non-exclusive, no-charge, royalty-free, irrevocable copyright license to
+reproduce, prepare Derivative Works of, publicly display, publicly perform,
+sublicense, and distribute the Work and such Derivative Works in Source or Object
+form.
+
+3. Grant of Patent License. Subject to the terms and conditions of this License,
+each Contributor hereby grants to You a perpetual, worldwide, non-exclusive,
+no-charge, royalty-free, irrevocable (except as stated in this section) patent
+license to make, have made, use, offer to sell, sell, import, and otherwise
+transfer the Work, where such license applies only to those patent claims
+licensable by such Contributor that are necessarily infringed by their
+Contribution(s) alone or by combination of their Contribution(s) with the Work to
+which such Contribution(s) was submitted. If You institute patent litigation
+against any entity (including a cross-claim or counterclaim in a lawsuit)
+alleging that the Work or a Contribution incorporated within the Work constitutes
+direct or contributory patent infringement, then any patent licenses granted to
+You under this License for that Work shall terminate as of the date such
+litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the Work or
+Derivative Works thereof in any medium, with or without modifications, and in
+Source or Object form, provided that You meet the following conditions:
+
+  a. You must give any other recipients of the Work or Derivative Works a copy of
+    this License; and
+
+  b. You must cause any modified files to carry prominent notices stating that
+    You changed the files; and
+
+  c. You must retain, in the Source form of any Derivative Works that You
+    distribute, all copyright, patent, trademark, and attribution notices from
+    the Source form of the Work, excluding those notices that do not pertain to
+    any part of the Derivative Works; and
+
+  d. If the Work includes a "NOTICE" text file as part of its distribution, then
+    any Derivative Works that You distribute must include a readable copy of the
+    attribution notices contained within such NOTICE file, excluding those
+    notices that do not pertain to any part of the Derivative Works, in at least
+    one of the following places: within a NOTICE text file distributed as part of
+    the Derivative Works; within the Source form or documentation, if provided
+    along with the Derivative Works; or, within a display generated by the
+    Derivative Works, if and wherever such third-party notices normally appear.
+    The contents of the NOTICE file are for informational purposes only and do
+    not modify the License. You may add Your own attribution notices within
+    Derivative Works that You distribute, alongside or as an addendum to the
+    NOTICE text from the Work, provided that such additional attribution notices
+    cannot be construed as modifying the License.
+
+You may add Your own copyright statement to Your modifications and may provide
+additional or different license terms and conditions for use, reproduction, or
+distribution of Your modifications, or for any such Derivative Works as a whole,
+provided Your use, reproduction, and distribution of the Work otherwise complies
+with the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise, any
+Contribution intentionally submitted for inclusion in the Work by You to the
+Licensor shall be under the terms and conditions of this License, without any
+additional terms or conditions. Notwithstanding the above, nothing herein shall
+supersede or modify the terms of any separate license agreement you may have
+executed with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade names,
+trademarks, service marks, or product names of the Licensor, except as required
+for reasonable and customary use in describing the origin of the Work and
+reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or agreed to in
+writing, Licensor provides the Work (and each Contributor provides its
+Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied, including, without limitation, any warranties or
+conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+PARTICULAR PURPOSE. You are solely responsible for determining the
+appropriateness of using or redistributing the Work and assume any risks
+associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory, whether in
+tort (including negligence), contract, or otherwise, unless required by
+applicable law (such as deliberate and grossly negligent acts) or agreed to in
+writing, shall any Contributor be liable to You for damages, including any
+direct, indirect, special, incidental, or consequential damages of any character
+arising as a result of this License or out of the use or inability to use the
+Work (including but not limited to damages for loss of goodwill, work stoppage,
+computer failure or malfunction, or any and all other commercial damages or
+losses), even if such Contributor has been advised of the possibility of such
+damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing the Work or
+Derivative Works thereof, You may choose to offer, and charge a fee for,
+acceptance of support, warranty, indemnity, or other liability obligations and/or
+rights consistent with this License. However, in accepting such obligations, You
+may act only on Your own behalf and on Your sole responsibility, not on behalf of
+any other Contributor, and only if You agree to indemnify, defend, and hold each
+Contributor harmless for any liability incurred by, or claims asserted against,
+such Contributor by reason of your accepting any such warranty or additional
+liability.
+
+END OF TERMS AND CONDITIONS
+
+APPENDIX: How to apply the Apache License to your work
+
+To apply the Apache License to your work, attach the following boilerplate
+notice, with the fields enclosed by brackets "[]" replaced with your own
+identifying information. (Don't include the brackets!) The text should be
+enclosed in the appropriate comment syntax for the file format. We also recommend
+that a file or class name and description of purpose be included on the same
+"printed page" as the copyright notice for easier identification within
+third-party archives.
+
+  Copyright [yyyy] [name of copyright owner] Licensed under the Apache License,
+  Version 2.0 (the "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
+  or agreed to in writing, software distributed under the License is
+  distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the specific language
+  governing permissions and limitations under the License.</pre>
+                <h1 id="CopyAndNotice">Copyright Data and Notices</h1>
+      <h2 id="COM_12b84a96a17dfb8e8febc176c991ce0be6faeb764c896c9189b2a377339a01d3">Jetbrains annotations 13.0</h2>
+                            <h3>Copyrights</h3>
+                <ul>
+                <li class="copyright">Copyright 2000-2009 JetBrains s.r.o.</li>
+                    <li class="copyright">Copyright 2000-2012 JetBrains s.r.o.</li>
+                    <li class="copyright">Copyright 2000-2013 JetBrains s.r.o.</li>
+                    <li class="copyright">Copyright 2006 Sascha Weinreuter</li>
+                    </ul>
+                <h2 id="COM_50135249085f97a65c16497de6a295dd69000b974dc3d6cc36424075f1822400">Kotlin 1.9.24</h2>
+                            <h3>Notice File</h3>
+               <pre>   =========================================================================
+   ==  NOTICE file corresponding to the section 4 d of                    ==
+   ==  the Apache License, Version 2.0,                                   ==
+   ==  in this case for the Kotlin Compiler distribution.                 ==
+   =========================================================================
+
+   Kotlin Compiler
+   Copyright 2010-2023 JetBrains s.r.o and respective authors and developers
+</pre>
+               <h3>Copyrights</h3>
+                <ul>
+                <li class="copyright">Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.</li>
+                    <li class="copyright">Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.</li>
+                    <li class="copyright">Copyright 2010-2021 JetBrains s.r.o. and Kotlin Programming Language contributors.</li>
+                    </ul>
+                <h2 id="COM_e69b7ef0e1e2bc6b276b7b3ebb4698b5249fac4944a946da9d8887d4e395810c">kotlin-reflect 1.9.24</h2>
+                            <h3>Notice File</h3>
+               <pre>   =========================================================================
+   ==  NOTICE file corresponding to the section 4 d of                    ==
+   ==  the Apache License, Version 2.0,                                   ==
+   ==  in this case for the Kotlin Compiler distribution.                 ==
+   =========================================================================
+
+   Kotlin Compiler
+   Copyright 2010-2023 JetBrains s.r.o and respective authors and developers</pre>
+               <h3>Copyrights</h3>
+                <ul>
+                <li class="copyright">Copyright 2000-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.</li>
+                    <li class="copyright">Copyright 2010-2015 JetBrains s.r.o.</li>
+                    <li class="copyright">Copyright 2010-2016 JetBrains s.r.o.</li>
+                    <li class="copyright">Copyright 2010-2017 JetBrains s.r.o.</li>
+                    <li class="copyright">Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.</li>
+                    <li class="copyright">Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license</li>
+                    <li class="copyright">Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.</li>
+                    <li class="copyright">Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.</li>
+                    <li class="copyright">Copyright 2010-2021 JetBrains s.r.o. and Kotlin Programming Language contributors.</li>
+                    <li class="copyright">Copyright 2010-2022 JetBrains s.r.o. and Kotlin Programming Language contributors.</li>
+                    <li class="copyright">Copyright 2010-2023 JetBrains s.r.o. and Kotlin Programming Language contributors.</li>
+                    </ul>
+                <h2 id="COM_a39f78d5a38115f82119628cf5feb5d457d9b771f9da1913286299e58ecf813c">kotlin-stdlib-common 1.9.24</h2>
+                            <h3>Notice File</h3>
+               <pre>   =========================================================================
+   ==  NOTICE file corresponding to the section 4 d of                    ==
+   ==  the Apache License, Version 2.0,                                   ==
+   ==  in this case for the Kotlin Compiler distribution.                 ==
+   =========================================================================
+
+   Kotlin Compiler
+   Copyright 2010-2023 JetBrains s.r.o and respective authors and developers</pre>
+               <h3>Copyrights</h3>
+                <ul>
+                <li class="copyright">Copyright 2010-2023 JetBrains s.r.o and respective authors and developers</li>
+                    </ul>
+                <h2 id="COM_2f44d7f2b65334e5583bb7962cc190b5eb5eceec6b34779d787813d2a1db0377">kotlinx-serialization-bom 1.6.3</h2>
+                            <h3>Notice File</h3>
+               <pre>   =========================================================================
+   ==  NOTICE file corresponding to the section 4 d of                    ==
+   ==  the Apache License, Version 2.0,                                   ==
+   ==  in this case for the kotlix.serialization library.                 ==
+   =========================================================================
+
+   kotlinx.serialization library.
+   Copyright 2017-2019 JetBrains s.r.o and respective authors and developers</pre>
+               <h3>Copyrights</h3>
+                <ul>
+                <li class="copyright">Copyright 2017-2019 JetBrains s.r.o and respective authors and developers</li>
+                    </ul>
+                <h2 id="COM_c5faaf094238f4caf7bafe5ae91436f14dcff7e1c234b078920588e4002fbd5c">kotlinx-serialization-core 1.6.3</h2>
+                            <h3>Notice File</h3>
+               <pre>   =========================================================================
+   ==  NOTICE file corresponding to the section 4 d of                    ==
+   ==  the Apache License, Version 2.0,                                   ==
+   ==  in this case for the kotlix.serialization library.                 ==
+   =========================================================================
+
+   kotlinx.serialization library.
+   Copyright 2017-2019 JetBrains s.r.o and respective authors and developers</pre>
+               <h3>Copyrights</h3>
+                <ul>
+                <li class="copyright">Copyright 2017-2019 JetBrains s.r.o and respective authors and developers</li>
+                    </ul>
+                <h2 id="COM_15df2336274e09df251ddc3ff3d0ad306715b7c71f9ee43943fe3abb02d50711">kotlinx-serialization-json 1.6.3</h2>
+                            <h3>Notice File</h3>
+               <pre>   =========================================================================
+   ==  NOTICE file corresponding to the section 4 d of                    ==
+   ==  the Apache License, Version 2.0,                                   ==
+   ==  in this case for the kotlix.serialization library.                 ==
+   =========================================================================
+
+   kotlinx.serialization library.
+   Copyright 2017-2019 JetBrains s.r.o and respective authors and developers</pre>
+               <h3>Copyrights</h3>
+                <ul>
+                <li class="copyright">Copyright 2017-2019 JetBrains s.r.o and respective authors and developers</li>
+                    </ul>
+                
+      </div>
+  </body>
+</html>

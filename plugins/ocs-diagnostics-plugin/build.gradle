@@ -1,0 +1,36 @@
+apply from: rootProject.file('gradle/plugins.gradle')
+apply plugin: 'com.github.gmazzo.buildconfig'
+
+dvCfgAutomation {
+    useBswmdModel = true
+}
+
+dependencies {
+    implementation project(":ocs-plugins-shared-lib")
+    implementation "com.vector.ocs:ocs-interop:$vOcsCore"
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    testImplementation "io.mockk:mockk:1.12.0"
+    testImplementation "org.mockito:mockito-core:5.11.0"
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+    testImplementation "org.jetbrains.kotlin:kotlin-test:1.9.24"
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+buildConfig {
+    className('BuildConfig')
+    packageName('com.vector.ocs.plugins')
+    useKotlinOutput {
+        topLevelConstants = false
+        internalVisibility = true
+    }
+    buildConfigField(
+            'String',
+            'DIAGNOSTICS_PLUGIN_VERSION',
+            "\"$vOcsDiag\""
+    )
+}
