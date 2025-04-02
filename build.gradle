@@ -1,0 +1,60 @@
+// Define used (gradle) plugins
+plugins {
+    id 'base'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.24' apply false
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.24' apply false
+    id 'com.github.gmazzo.buildconfig' version '4.1.2' apply false
+}
+
+// Define the group for all built artifacts
+allprojects {
+    group = 'com.vector.ocs.plugins'
+}
+
+// Declare all used repositories
+subprojects {
+    repositories {
+        mavenCentral()
+        // Repository for Vector artifacts like OCS Core or Domain Plugins
+        maven {
+            // Adjust path here to find maven repository if necessary
+            url "../../" + property('ocsRepo')
+        }
+        // Local publishing for quick development processes
+        mavenLocal()
+    }
+}
+
+//-----------
+// PUBLISHING
+// ----------
+
+enum PublishMode {
+    NORMAL, SNAPSHOT, LOCKED
+}
+
+// Provided PublishMode parameter (string) from command line call is evaluated
+// and the PublishMode object is set accordingly
+PublishMode evalPublishMode() {
+    String key = 'publishMode'
+    if (!rootProject.hasProperty(key)) {
+        return PublishMode.LOCKED
+    }
+    String value = rootProject.property(key)
+    switch (value) {
+        case 'normal': return PublishMode.NORMAL
+        case 'snapshot': return PublishMode.SNAPSHOT
+        default: return PublishMode.LOCKED
+    }
+}
+
+long currentTimeMillis = System.currentTimeMillis()
+
+// For Snapshot publishing a timestamp is added onto the version of the published artifact (plugin)
+rootProject.ext.publishVersion = { Project project ->
+    String result = project.version
+    if (evalPublishMode() == PublishMode.SNAPSHOT) {
+        result = result + '-' + currentTimeMillis
+    }
+    return result
+}

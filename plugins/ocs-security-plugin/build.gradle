@@ -1,0 +1,25 @@
+apply from: rootProject.file('gradle/plugins.gradle')
+apply plugin: 'com.github.gmazzo.buildconfig'
+
+dvCfgAutomation {
+    useBswmdModel = true
+}
+
+dependencies {
+    implementation project(":ocs-plugins-shared-lib")
+    implementation "com.vector.ocs:ocs-interop:$vOcsCore"
+}
+
+buildConfig {
+    className('BuildConfig')
+    packageName('com.vector.ocs.plugins')
+    useKotlinOutput {
+        topLevelConstants = false
+        internalVisibility = true
+    }
+    buildConfigField(
+            'String',
+            'SECURITY_PLUGIN_VERSION',
+            "\"$vOcsSecurity\""
+    )
+}

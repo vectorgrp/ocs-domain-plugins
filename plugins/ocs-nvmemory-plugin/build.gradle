@@ -1,0 +1,24 @@
+apply from: rootProject.file('gradle/plugins.gradle')
+apply plugin: 'com.github.gmazzo.buildconfig'
+
+dvCfgAutomation {
+    useBswmdModel = true
+}
+
+dependencies {
+    implementation project(":ocs-plugins-shared-lib")
+}
+
+buildConfig {
+    className('BuildConfig')
+    packageName('com.vector.ocs.plugins')
+    useKotlinOutput {
+        topLevelConstants = false
+        internalVisibility = true
+    }
+    buildConfigField(
+            'String',
+            'NVMEMORY_PLUGIN_VERSION',
+            "\"$vOcsNvM\""
+    )
+}

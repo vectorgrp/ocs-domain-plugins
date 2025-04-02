@@ -1,0 +1,2 @@
+// Please specify the path to your DaVinci Configurator installation in your SIP.
+project.ext.dvCfgInstallation = new File("$localSipStore/$localSip/DaVinciConfigurator")
