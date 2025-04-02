@@ -97,7 +97,7 @@ Switch into the `ocs-domain-plugins` directory and call the `.\gradlew build` co
 ```batch
 D:\dev\ocs\ocs-domain-plugins>.\gradlew build
 ```
-The first build can take some time as additional gradle plugins are download from the maven repository. You succeed when
+The first build can take some time as additional gradle plugins are downloaded from the maven repository. You succeed when
 the build states: `BUILD SUCCESSFUL`. Otherwise, you need to figure out what went wrong.
 
 ### Publish the OCS Domain Plugin jar files
@@ -159,7 +159,7 @@ The steps are equal to the OCS Domain Plugins. This time go to the `ocs-custom-a
 ```batch
 D:\dev\ocs\ocs-custom-app>.\gradlew build
 ```
-The first build can take some time as additional gradle plugins are download from the maven repository. You succeed when
+The first build can take some time as additional gradle plugins are downloaded from the maven repository. You succeed when
 the build states: `BUILD SUCCESSFUL`. Otherwise, you need to figure out what went wrong.
 
 ### Executing the OCS Custom App
