@@ -51,23 +51,23 @@ import com.vector.ocs.lib.shared.Cfg5Client.getChildContainerList
 import com.vector.ocs.lib.shared.Cfg5Client.setParameter
 import com.vector.ocs.lib.shared.HelperLib.getValueInteger
 import com.vector.ocs.plugins.diagnostics.application.port.out.cfgAPI.ConfigServiceAPI
-import com.vector.ocs.plugins.diagnostics.constants.ComMDefRefs
-import com.vector.ocs.plugins.diagnostics.constants.DcmDefRefs
-import com.vector.ocs.plugins.diagnostics.constants.DemDefRefs
-import com.vector.ocs.plugins.diagnostics.constants.NvMDefRefs
 import com.vector.ocs.plugins.diagnostics.domain.ComM.ComM
 import com.vector.ocs.plugins.diagnostics.domain.Dcm.*
 import com.vector.ocs.plugins.diagnostics.domain.Dem.*
 import com.vector.ocs.plugins.diagnostics.domain.EnumTypes.EnumTypes
 import com.vector.ocs.plugins.diagnostics.domain.NvM.NvM
 import com.vector.ocs.plugins.diagnostics.domain.NvM.NvMBlockDescriptor
+import com.vector.ocs.plugins.diagnostics.constants.DcmDefRefs.DcmDefRefConstantsFactory
+import com.vector.ocs.plugins.diagnostics.constants.DemDefRefs.DemDefRefConstantsFactory
+import com.vector.ocs.plugins.diagnostics.constants.NvMDefRefs.NvMDefRefConstantsFactory
+import com.vector.ocs.plugins.diagnostics.constants.ComMDefRefs.ComMDefRefConstantsFactory
 
 class Cfg5ApiDiagnosticsAdapter : ConfigServiceAPI {
 
-    private val demDefRefs = DemDefRefs.DemDefRefConstantsFactory.getConstants() // Get Dem MDF-DefRefs depending on release
-    private val dcmDefRefs = DcmDefRefs.DcmDefRefConstantsFactory.getConstants() // Get Dcm MDF-DefRefs depending on release
-    private val comMDefRefs = ComMDefRefs.ComMDefRefConstantsFactory.getConstants() // Get ComM MDF-DefRefs depending on release
-    private val nvMDefRefs = NvMDefRefs.NvMDefRefConstantsFactory.getConstants() // Get NvM MDF-DefRefs depending on release
+    private val demDefRefs = DemDefRefConstantsFactory.getConstants() // Get Dem MDF-DefRefs depending on release
+    private val dcmDefRefs = DcmDefRefConstantsFactory.getConstants() // Get Dcm MDF-DefRefs depending on release
+    private val comMDefRefs = ComMDefRefConstantsFactory.getConstants() // Get ComM MDF-DefRefs depending on release
+    private val nvMDefRefs = NvMDefRefConstantsFactory.getConstants() // Get NvM MDF-DefRefs depending on release
 
     /**
      * Write all containers and parameters which are necessary for diagnostics

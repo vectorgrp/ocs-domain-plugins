@@ -79,15 +79,25 @@ abstract class NvMDefRefs {
 
     open class NvMDefRefsR31 : NvMDefRefs() {
         init {
-
+            minorVersion = 28
         }
+    }
+
+    open class NvMDefRefsR34 : NvMDefRefs() {
+        init {
+            minorVersion = 31
+        }
+    }
+
+    companion object {
+        var minorVersion = 28
     }
 
     object NvMDefRefConstantsFactory {
         fun getConstants(): NvMDefRefs {
-            val minorVersion = PluginsCommon.Cfg5MinorVersion()
             return when {
-                minorVersion.toInt() >= 28 -> NvMDefRefsR31()
+                PluginsCommon.Cfg5MinorVersion().toInt() >= 31 -> NvMDefRefsR34()
+                PluginsCommon.Cfg5MinorVersion().toInt() >= 28 -> NvMDefRefsR31()
                 else -> throw IllegalArgumentException("Unknown version: $minorVersion")
             }
         }
