@@ -73,10 +73,10 @@ class CommunicationComConfig {
                     Com comCfg = bswmdModel(Com.DefRef).single()
                     /* Setup default Rx/Tx MainFunctions */
                     transaction {
-                        logger.info("Setting up comMainFunctionRxDefault with Cycle time " + model.comMainFunctionSettings.defaultMainFunctionRxCycle.toInteger() / 1000 + "ms. Referencing all Com Rx PDUs to it.")
+                        logger.info("Setting up comMainFunctionRxDefault with Cycle time " + model.comMainFunctionSettings.defaultMainFunctionRxCycle.toInteger() + "ms. Referencing all Com Rx PDUs to it.")
                         ComMainFunctionRx defRxMain = comCfg.comConfig.comMainFunctionRx.byNameOrCreate("comMainFunctionRxDefault")
                         defRxMain.comMainRxTimeBaseOrCreate.value = model.comMainFunctionSettings.defaultMainFunctionRxCycle.toInteger() / 1000
-                        logger.info("Setting up comMainFunctionTxDefault with Cycle time " + model.comMainFunctionSettings.defaultMainFunctionTxCycle.toInteger() / 1000 + "ms. Referencing all Com Tx PDUs to it.")
+                        logger.info("Setting up comMainFunctionTxDefault with Cycle time " + model.comMainFunctionSettings.defaultMainFunctionTxCycle.toInteger() + "ms. Referencing all Com Tx PDUs to it.")
                         ComMainFunctionTx defTxMain = comCfg.comConfig.comMainFunctionTx.byNameOrCreate("comMainFunctionTxDefault")
                         defTxMain.comMainTxTimeBaseOrCreate.value = model.comMainFunctionSettings.defaultMainFunctionTxCycle.toInteger() / 1000
                         /* Reference all signals not referenced by special lists to the default MainFunctions */
