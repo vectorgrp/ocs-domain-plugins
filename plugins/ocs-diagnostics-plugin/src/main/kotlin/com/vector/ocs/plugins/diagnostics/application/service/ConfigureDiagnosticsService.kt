@@ -42,7 +42,9 @@ import com.vector.ocs.plugins.diagnostics.EDefaultDcmBuffer
 import com.vector.ocs.plugins.diagnostics.EDefaultDebouncingStrategy
 import com.vector.ocs.plugins.diagnostics.application.port.`in`.ConfigureDiagnosticsUseCase
 import com.vector.ocs.plugins.diagnostics.application.port.out.cfgAPI.ConfigServiceAPI
+import com.vector.ocs.plugins.diagnostics.constants.DcmDefRefs
 import com.vector.ocs.plugins.diagnostics.constants.DiagnosticConstants
+import com.vector.ocs.plugins.diagnostics.constants.NvMDefRefs
 import com.vector.ocs.plugins.diagnostics.domain.ComM.ComM
 import com.vector.ocs.plugins.diagnostics.domain.Dcm.Dcm
 import com.vector.ocs.plugins.diagnostics.domain.Dcm.DcmDslBuffer
@@ -263,7 +265,7 @@ class ConfigureDiagnosticsService(
         nvMBlockDescriptor.nvMBlockUseSetRamBlockStatus = true
 
         if (name == "Primary") {
-            nvMBlockDescriptor.nvMRomBlockDataAddress = "Dem_Cfg_MemoryEntryInit"
+            nvMBlockDescriptor.nvMRomBlockDataAddress = if (NvMDefRefs.minorVersion >= DiagnosticConstants.CFG5_VERSION_R34) "Dem_Cfg_PrimaryEventEntryInit" else "Dem_Cfg_MemoryEntryInit"
             nvMBlockDescriptor.nvMSingleBlockCallback = "Dem_NvM_JobFinished"
             nvMBlockDescriptor.nvMRamBlockDataAddress = "Dem_Cfg_PrimaryEntry_$counter"
             nvMBlockDescriptor.nvMUseInitCallback = false
