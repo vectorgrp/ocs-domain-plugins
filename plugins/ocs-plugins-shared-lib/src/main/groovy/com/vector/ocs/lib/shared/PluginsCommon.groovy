@@ -165,4 +165,20 @@ class PluginsCommon {
         int cfgMinorVersion = daVinciVersion.substring(2, 4).toInteger()
         return cfgMinorVersion
     }
+
+    /**
+     * Determines the service pack version of the DaVinci Configurator Classic (CFG5)
+     * @return cfgServicePackVersion is the service pack version of the DaVinci Configurator Classic (CFG5), or 0 for major version
+     */
+    static Number Cfg5ServicePackVersion() {
+        int cfgServicePackVersion = 0
+        String versionString = ScriptApi.scriptCode.getInstance(IProductVersionApiEntryPoint.class).versions.daVinciConfiguratorVersion
+        String daVinciVersion = versionString.replace("DaVinciConfigurator\t", "")
+        String[] cfgServicePackVersionSplit = daVinciVersion.split(" ")
+        // Example: 5.29.50 SP5 > [5.29.50, SP5]
+        if (cfgServicePackVersionSplit.size() > 1) {
+            cfgServicePackVersion = cfgServicePackVersionSplit[1].replace("SP", "").toInteger()
+        }
+        return cfgServicePackVersion
+    }
 }

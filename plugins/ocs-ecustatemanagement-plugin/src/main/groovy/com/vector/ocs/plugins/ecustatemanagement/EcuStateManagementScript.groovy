@@ -357,20 +357,28 @@ class EcuStateManagementScript {
                     modeManagement { modeMngt ->
                         if (bswMConfigs.size() > 0) {
                             try {
-                                getBswMAutoConfigDomains(bswMConfigs.first).each { autoConfigurationDomain ->
+                                MIContainer bswMConfigContainer
+                                if (!distinctNewModeManagementApiUsage()) {
+                                    // Former API usage
+                                    bswMConfigContainer = bswMConfigs.first
+                                } else {
+                                    // New API usage
+                                    bswMConfigContainer = null
+                                }
+                                getBswMAutoConfigDomains(bswMConfigContainer).each { autoConfigurationDomain ->
                                     if (null != autoConfigurationDomain.identifier && "Module Initialization" != autoConfigurationDomain.identifier) {
                                         switch (autoConfigurationDomain.identifier) {
                                             case "Communication Control":
                                                 logger.info("Processing Communication Control domain.")
-                                                CommunicationControl.initializeAndProcessDomain(model, modeMngt, autoConfigurationDomain.identifier, bswMConfigs.first, logger)
+                                                CommunicationControl.initializeAndProcessDomain(model, modeMngt, autoConfigurationDomain.identifier, bswMConfigContainer, logger)
                                                 break
                                             case "Ecu State Handling":
                                                 logger.info("Processing Ecu State Handling domain.")
-                                                EcuStateHandling.initializeAndProcessDomain(model, modeMngt, autoConfigurationDomain.identifier, bswMConfigs.first, logger)
+                                                EcuStateHandling.initializeAndProcessDomain(model, modeMngt, autoConfigurationDomain.identifier, bswMConfigContainer, logger)
                                                 break
                                             case "Service Discovery Control":
                                                 logger.info("Processing Service Discovery Control domain.")
-                                                ServiceDiscoveryControl.initializeAndProcessDomain(model, modeMngt, autoConfigurationDomain.identifier, bswMConfigs.first, logger)
+                                                ServiceDiscoveryControl.initializeAndProcessDomain(model, modeMngt, autoConfigurationDomain.identifier, bswMConfigContainer, logger)
                                                 break
                                             default:
                                                 logger.info("Unknown AutoConfigurationDomain identifier detected '$autoConfigurationDomain.identifier'")
@@ -426,5 +434,22 @@ class EcuStateManagementScript {
             initItem.ecuMModuleIDOrCreate.value = initFunction.moduleRef.refTargetMdf.name
         }
         initItem.ecuMModuleServiceOrCreate.value = initFunction.shortname
+    }
+
+    /**
+     * Certain DaVinci Configurator Service Pack versions require distinct ways to call the Mode Management comfort APIs.
+     * This method checks the corresponding minor version and service pack version.
+     * @return true if new API handling is required, otherwise false.
+     */
+    static boolean distinctNewModeManagementApiUsage() {
+        Number minorVersion = PluginsCommon.Cfg5MinorVersion()
+        Number cfg5ServicePackVersion = PluginsCommon.Cfg5ServicePackVersion()
+        boolean useNewApi = false
+        if ((minorVersion == 29 && cfg5ServicePackVersion >= 5) || /* R32 */
+            (minorVersion == 30 && cfg5ServicePackVersion >= 4) || /* R33 */
+            (minorVersion == 31 && cfg5ServicePackVersion >= 2)) { /* R34 */
+            useNewApi = true
+        }
+        return useNewApi
     }
 }
