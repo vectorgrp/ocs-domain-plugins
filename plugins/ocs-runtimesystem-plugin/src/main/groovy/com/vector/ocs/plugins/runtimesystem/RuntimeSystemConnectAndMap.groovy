@@ -244,20 +244,21 @@ class RuntimeSystemConnectAndMap {
             handleInterruptMapping(model.interruptMapping.userDefinedMapping, model.interruptMapping.defaultIsrApplication, logger)
 
             // 4. Map runnables to tasks
-            handleTaskMapping(model.taskMapping.userDefinedMapping, model.taskMapping.defaultBswTask, model.cores, logger)
-
-            // 5. Trigger RTE solving action to fix the runnable order
             logger.debug("Check that Rte module is available.")
             Boolean isRtePresent = PluginsCommon.ConfigPresent(RuntimeSystemConstants.RTE_DEFREF)
             if (isRtePresent) {
-                triggerRteSolvingActionForRunnableOrder(logger)
+                triggerRteSolvingActionForCreationOfMissingBswEventContainer(logger)
             }
+            handleTaskMapping(model.taskMapping.userDefinedMapping, model.taskMapping.defaultBswTask, model.cores, logger)
+
+            // 5. Trigger RTE solving action to fix the runnable order
+            if (isRtePresent) {
+                triggerRteSolvingActionForRunnableOrder(logger)
 
             // 6. Trigger calculation phase of the Rte to create additional Os configuration
             // Currently it is not clear if this operation could be also done in another context, e.g. individual file
             // which address the Rte configuration parts. Therefore for not it is kept here but the Rte.DefRef is not
             // directly used. instead the DefRef is created itself in the triggerRteCalculation()
-            if (isRtePresent) {
                 triggerRteCalculation(logger)
             }
 
@@ -910,6 +911,37 @@ class RuntimeSystemConnectAndMap {
                             isId(RTE, 1068)
                         }.withAction {
                             logger.info("Trigger RTE1068 solving action.")
+                            solvingActions.first
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Trigger the following solving action of the RTE BSW module.<br>
+     * <ul>
+     *     <li>RTE1009</li>
+     * </ul>
+     * @param logger
+     */
+    private static void triggerRteSolvingActionForCreationOfMissingBswEventContainer(OcsLogger logger) {
+        activeProject() { IProject project ->
+            PluginsCommon.modelSynchronization(project, logger)
+            // Justify missing return statement because it could be the case that no solving action appears
+            //noinspection GroovyMissingReturnStatement
+            validation {
+                final String RTE = "RTE"
+                Collection<IValidationResultUI> rte1009Results = validationResults.findAll { IValidationResultUI iValidationResults ->
+                    iValidationResults.isId(RTE, 1009) && iValidationResults.isActive()
+                }
+                if (!rte1009Results.isEmpty()) {
+                    solver.solve {
+                        result {
+                            isId(RTE, 1009)
+                        }.withAction {
+                            logger.info("Trigger RTE1009 solving action.")
                             solvingActions.first
                         }
                     }
