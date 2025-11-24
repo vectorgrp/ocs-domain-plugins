@@ -42,7 +42,6 @@ import com.vector.ocs.plugins.diagnostics.EDefaultDcmBuffer
 import com.vector.ocs.plugins.diagnostics.EDefaultDebouncingStrategy
 import com.vector.ocs.plugins.diagnostics.application.port.`in`.ConfigureDiagnosticsUseCase
 import com.vector.ocs.plugins.diagnostics.application.port.out.cfgAPI.ConfigServiceAPI
-import com.vector.ocs.plugins.diagnostics.constants.DcmDefRefs
 import com.vector.ocs.plugins.diagnostics.constants.DiagnosticConstants
 import com.vector.ocs.plugins.diagnostics.constants.NvMDefRefs
 import com.vector.ocs.plugins.diagnostics.domain.ComM.ComM
@@ -97,8 +96,15 @@ class ConfigureDiagnosticsService(
 
             // Set reference to DcmDsdServiceTable
             if (model.defaultDcmServiceTableAssignment == true) {
-                currentProtocolRow.dcmDsdServiceTableRef = dcm.dcmDsdServiceTableList[index]
-                logger.infoMessage("Setting default Service Table " + dcm.dcmDsdServiceTableList[index].shortName + " set as reference for protocol row " + currentProtocolRow.shortName + ".")
+                val serviceTableRef = if (index < dcm.dcmDsdServiceTableList.size) {
+                    dcm.dcmDsdServiceTableList[index]
+                } else {
+                    // Fallback to the first service table if index exceeds the list size
+                    dcm.dcmDsdServiceTableList.first()
+                }
+
+                currentProtocolRow.dcmDsdServiceTableRef = serviceTableRef
+                logger.infoMessage("Setting Service Table " + serviceTableRef.shortName + " as reference for protocol row " + currentProtocolRow.shortName + ".")
             }
 
             // Add DcmDslBuffer
