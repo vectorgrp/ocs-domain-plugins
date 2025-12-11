@@ -137,7 +137,7 @@ class MicrosarEepvMemAccM extends GeneralEep {
                 activeEcuc.allModules.each { MIModuleConfiguration active_module ->
                     if (active_module.name == "Eep") {
                         transaction {
-                            active_module.bswmdModel().getEepGeneralOrCreate().eepMainFunctionPeriodOrCreate.setValueMdf(0.005)
+                            active_module.bswmdModel().getEepGeneralOrCreate().eepMainFunctionPeriodOrCreate.setValueMdf(0.005D)
                             active_module.bswmdModel().getEepGeneralOrCreate().eepMainFunctionTriggeringOrCreate.setValueMdf("FixedCycleTime")
                             logger.info("The eepMainFunctionPeriod is set to 0.005s and the eepMainFunctionTriggering is set to FixedCycleTime within container /ActiveEcuC/Eep/Eep_30_vMemAccMGeneral.")
                         }

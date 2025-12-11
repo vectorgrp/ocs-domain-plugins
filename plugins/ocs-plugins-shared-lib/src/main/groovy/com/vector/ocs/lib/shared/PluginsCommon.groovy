@@ -42,10 +42,9 @@
 package com.vector.ocs.lib.shared
 
 import com.vector.cfg.automation.api.ScriptApi
-import com.vector.cfg.automation.api.version.IProductVersionApiEntryPoint
 import com.vector.cfg.automation.scripting.api.project.IProject
 import com.vector.cfg.model.access.DefRef
-import com.vector.cfg.model.access.IReferrableAccess
+import com.vector.cfg.model.asr.access.IAsrReferrableAccess
 import com.vector.cfg.model.mdf.MIObject
 import com.vector.cfg.model.mdf.commoncore.autosar.MIReferrable
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIParameterValue
@@ -76,7 +75,7 @@ class PluginsCommon {
      * @return true if the defRef is present in the SIP, otherwise false
      */
     static boolean DefRefPresent(IProject project, String defRef, OcsLogger logger) {
-        IReferrableAccess referrableAccess = project.getInstance(IReferrableAccess)
+        IAsrReferrableAccess referrableAccess = project.getInstance(IAsrReferrableAccess)
         boolean result = false
         if ((defRef != null) && (!defRef.empty)) {
             MIReferrable miReferrable = referrableAccess.getReferrableByPath(defRef)
@@ -153,32 +152,5 @@ class PluginsCommon {
                 }
             }
         }
-    }
-
-    /**
-     * Determines the minor version of the DaVinci Configurator Classic (CFG5)
-     * @return cfgMinorVersion is the minor version of the DaVinci Configurator Classic (CFG5)
-     */
-    static Number Cfg5MinorVersion() {
-        String versionString = ScriptApi.scriptCode.getInstance(IProductVersionApiEntryPoint.class).versions.daVinciConfiguratorVersion
-        String daVinciVersion = versionString.replace("DaVinciConfigurator\t", "")
-        int cfgMinorVersion = daVinciVersion.substring(2, 4).toInteger()
-        return cfgMinorVersion
-    }
-
-    /**
-     * Determines the service pack version of the DaVinci Configurator Classic (CFG5)
-     * @return cfgServicePackVersion is the service pack version of the DaVinci Configurator Classic (CFG5), or 0 for major version
-     */
-    static Number Cfg5ServicePackVersion() {
-        int cfgServicePackVersion = 0
-        String versionString = ScriptApi.scriptCode.getInstance(IProductVersionApiEntryPoint.class).versions.daVinciConfiguratorVersion
-        String daVinciVersion = versionString.replace("DaVinciConfigurator\t", "")
-        String[] cfgServicePackVersionSplit = daVinciVersion.split(" ")
-        // Example: 5.29.50 SP5 > [5.29.50, SP5]
-        if (cfgServicePackVersionSplit.size() > 1) {
-            cfgServicePackVersion = cfgServicePackVersionSplit[1].replace("SP", "").toInteger()
-        }
-        return cfgServicePackVersion
     }
 }

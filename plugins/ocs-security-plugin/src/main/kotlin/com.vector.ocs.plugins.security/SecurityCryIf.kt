@@ -38,15 +38,14 @@ package com.vector.ocs.plugins.security
 import com.vector.ocs.lib.shared.HelperLib.createOrGetContainer
 import com.vector.ocs.lib.shared.HelperLib.getContainerList
 import com.vector.cfg.automation.api.ScriptApi
+import com.vector.cfg.model.pai.api.transaction
 import com.vector.ocs.core.api.OcsLogger
-import com.vector.ocs.interop.transactionApi
 import com.vector.ocs.lib.shared.HelperLib.getModule
 import com.vector.ocs.lib.shared.HelperLib.getParam
 import com.vector.ocs.lib.shared.HelperLib.getValueString
 import com.vector.ocs.lib.shared.HelperLib.setParam
 
 private val project = ScriptApi.getActiveProject()
-private val transactionApi = project.transactionApi
 private val cryIfCfg = project.getModule("/MICROSAR/CryIf")
 
 /**
@@ -54,7 +53,7 @@ private val cryIfCfg = project.getModule("/MICROSAR/CryIf")
  * @param logger Logger for logging messages
  */
 internal fun createCryIfChannel(logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         val cryIfChannelCfg = cryIfCfg.createOrGetContainer("CryIfChannel")
         cryIfChannelCfg?.setParam("CryIfDriverObjectRef", "/ActiveEcuC/Crypto/CryptoDriverObjects/Crypto_30_LibCv")
     }
@@ -66,7 +65,7 @@ internal fun createCryIfChannel(logger: OcsLogger) {
  * @param logger Logger for logging messages
  */
 internal fun createCryIfCryptoModule(logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         val cryIfCryptoModuleCfg = cryIfCfg.createOrGetContainer("CryIfCryptoModule")
         cryIfCryptoModuleCfg?.setParam("CryIfCryptoModuleRef", "/ActiveEcuC/Crypto")
         cryIfCryptoModuleCfg?.setParam("CryIfSupportsKeyElementCopyPartial", true)
@@ -82,7 +81,7 @@ internal fun createCryIfCryptoModule(logger: OcsLogger) {
  */
 internal fun createCryIfKey(name: String, cryptoRef: String, logger: OcsLogger) {
     var flag = true
-    transactionApi.transaction {
+    project.transaction() {
         cryIfCfg.getContainerList("CryIfKey").forEach { cryIfKey ->
             if (cryIfKey.getParam("CryIfKeyRef")?.getValueString() == null) {
                 cryIfKey.name = name

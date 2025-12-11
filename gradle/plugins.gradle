@@ -1,12 +1,13 @@
 apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'com.vector.cfg.pai.automation-build-gradle'
 apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
-
-//rootProject.ext.sip.applyAutomationInterfacePlugin(project)
-apply from: rootProject.file ('gradle/dvCfgAutomationBootstrap.gradle')
-
-dvCfgAutomation {
+scriptProject {
+    cfgPath = file(cfg6)
+    bswmd{
+        bswPath = file("$localSipStore/$localSip")
+        isActivated = false
+    }
     includeDependenciesIntoJar = false
-    jarSigningEnabled = false
 }
 
 // Set dependencies to specific versions of the core api and the json api
@@ -63,6 +64,8 @@ tasks.register('buildAllPlugins') {
     pluginVersions.each { pluginName, version ->
         dependsOn(":${pluginName}:build")
     }
+
+    dependsOn ":ocs-diagnostics-plugin-test:test"
 }
 
 //-----------

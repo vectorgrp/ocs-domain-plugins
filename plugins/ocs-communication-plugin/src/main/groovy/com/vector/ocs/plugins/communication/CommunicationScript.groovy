@@ -43,8 +43,8 @@ package com.vector.ocs.plugins.communication
 
 import com.vector.cfg.automation.api.ScriptApi
 import com.vector.cfg.automation.scripting.api.project.IProject
-import com.vector.cfg.consistency.ui.ISolvingActionUI
-import com.vector.cfg.consistency.ui.IValidationResultUI
+import com.vector.cfg.consistency.requester.solvingaction.ISolvingActionUI
+import com.vector.cfg.consistency.requester.IValidationResultUI
 import com.vector.ocs.core.api.OcsLogger
 import com.vector.ocs.lib.shared.PluginsCommon
 import groovy.transform.PackageScope
@@ -84,6 +84,26 @@ class CommunicationScript {
         logger.info("Check that Xcp module is available.")
         if (PluginsCommon.ConfigPresent(CommunicationConstants.XCP_DEFREF)) {
             CommunicationXcpConfig.CorrectXcpConfig(model, logger)
+        }
+
+        ScriptApi.activeProject() { IProject project ->
+            validation {
+                final String CAN_CORE = "CAN_CORE"
+                Collection<IValidationResultUI> canCore2027Results = validationResults.findAll { IValidationResultUI iValidationResults ->
+                    iValidationResults.isId(CAN_CORE, 2027) && iValidationResults.isActive()
+                }
+                if (!canCore2027Results.isEmpty()) {
+                    logger.info("Trying to solve CAN_CORE02027 configuration errors.")
+                    solver.solve {
+                        result {
+                            isId(CAN_CORE, 2027)
+                        }.withAction {
+                            it.getSolvingActions().getFirst()
+                        }
+                    }
+                    logger.info("Configure vCan_Canoe and vCanVTT modules using solving action CAN_CORE02027.")
+                }
+            }
         }
     }
 
@@ -146,7 +166,8 @@ class CommunicationScript {
                 if (!pdur10520Results.isEmpty()) {
                     logger.info("Trying to solve PDUR10520 configuration errors.")
                     solver.solve {
-                        result { ISolvingActionUI
+                        result {
+                            ISolvingActionUI
                             isId(PDUR, 10520)
                         }.withAction {
                             containsString("false")

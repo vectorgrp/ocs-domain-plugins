@@ -91,10 +91,6 @@ class RuntimeSystemConstants {
         @JvmStatic
         val patternEcuM: Pattern = Pattern.compile(".*EcuM.*")
 
-        /** String list for SWC Instance mapping */
-        @JvmStatic
-        val swcInstances: MutableList<String> = mutableListOf("Det", "Csm", "SecOC")
-
         /** Default values for the OsHooks */
         @JvmStatic
         val rtsOsHooks: RtsOsHooks = RtsOsHooks(

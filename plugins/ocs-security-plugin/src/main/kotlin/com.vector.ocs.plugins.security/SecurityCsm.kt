@@ -36,8 +36,8 @@
 package com.vector.ocs.plugins.security
 
 import com.vector.cfg.automation.api.ScriptApi
+import com.vector.cfg.model.pai.api.transaction
 import com.vector.ocs.core.api.OcsLogger
-import com.vector.ocs.interop.transactionApi
 import com.vector.ocs.lib.shared.HelperLib.createOrGetContainer
 import com.vector.ocs.lib.shared.HelperLib.delete
 import com.vector.ocs.lib.shared.HelperLib.getContainer
@@ -46,7 +46,6 @@ import com.vector.ocs.lib.shared.HelperLib.getModule
 import com.vector.ocs.lib.shared.HelperLib.setParam
 
 private val project = ScriptApi.getActiveProject()
-private val transactionApi = project.transactionApi
 private val csmCfg = project.getModule("/MICROSAR/Csm")
 
 /**
@@ -59,7 +58,7 @@ private val csmCfg = project.getModule("/MICROSAR/Csm")
  * @param logger Logger for logging messages
  */
 internal fun createCsmJob(csmJobName: String, csmKey: String, csmPrimitive: String, csmQueue: String, logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         val csmJobsCfg = csmCfg.createOrGetContainer("CsmJobs")
         /* Delete automatically created CsmJob (only when CsmJobs container was not yet created) */
         csmJobsCfg?.getContainerList("CsmJob")?.forEach {
@@ -82,7 +81,7 @@ internal fun createCsmJob(csmJobName: String, csmKey: String, csmPrimitive: Stri
  * @param logger Logger for logging messages
  */
 internal fun createCsmPrimitive(name: String, primitive: String, logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         val csmPrimitivesCfg = csmCfg.createOrGetContainer("CsmPrimitives", name)
         val csmPrimitive = csmPrimitivesCfg?.createOrGetContainer("Csm$primitive")
         val csmPrimitiveCfg = csmPrimitive?.getContainer("Csm" + primitive + "Config")
@@ -116,7 +115,7 @@ internal fun createCsmPrimitive(name: String, primitive: String, logger: OcsLogg
  * @param logger Logger for logging messages
  */
 internal fun createCsmQueue(name: String, csmMainFunction: String, logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         val csmQueuesCfg = csmCfg.createOrGetContainer("CsmQueues")
         /* Delete automatically created CsmJob (only when CsmJobs container was not yet created) */
         csmQueuesCfg?.getContainerList("CsmQueue")?.forEach {
@@ -138,7 +137,7 @@ internal fun createCsmQueue(name: String, csmMainFunction: String, logger: OcsLo
  * @param logger Logger for logging messages
  */
 internal fun createCsmKey(name: String, cryIfKeyRef: String, logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         val csmKeysCfg = csmCfg.createOrGetContainer("CsmKeys")
         val csmKeyCfg = csmKeysCfg?.createOrGetContainer("CsmKey", name)
         csmKeyCfg?.setParam("CsmKeyRef", "/ActiveEcuC/CryIf/$cryIfKeyRef")
@@ -153,7 +152,7 @@ internal fun createCsmKey(name: String, cryIfKeyRef: String, logger: OcsLogger) 
  * @param logger Logger for logging messages
  */
 internal fun createCsmMainFunction(name: String, mainFunctionPeriod: Long, logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         val csmMainFunctionCfg = csmCfg.createOrGetContainer("CsmMainFunction", name)
         csmMainFunctionCfg?.setParam("CsmMainFunctionPeriod", mainFunctionPeriod)
     }
@@ -166,7 +165,7 @@ internal fun createCsmMainFunction(name: String, mainFunctionPeriod: Long, logge
  * @param logger Logger for logging messages
  */
 internal fun createCsmMainFunction(name: String, logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         csmCfg.createOrGetContainer("CsmMainFunction", name)
     }
     logger.info("Created CsmMainFunction $name.")
@@ -178,7 +177,7 @@ internal fun createCsmMainFunction(name: String, logger: OcsLogger) {
  * @param logger Logger for logging messages
  */
 internal fun createCsmCustomIncludeFile(includeFile: String, logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         val csmGeneralCfg = csmCfg.getContainer("CsmGeneral")
         csmGeneralCfg?.setParam("CsmCustomIncludeFiles", includeFile, -1)
     }

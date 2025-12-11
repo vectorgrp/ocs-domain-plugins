@@ -1,13 +1,16 @@
 apply from: rootProject.file('gradle/plugins.gradle')
 apply plugin: 'com.github.gmazzo.buildconfig'
+// Handle BSWMD dependencies
+apply from: rootProject.file('gradle/bswmd.gradle')
 
-dvCfgAutomation {
-    useBswmdModel = true
+scriptProject {
+    bswmd{
+        isActivated = true
+    }
 }
 
 dependencies {
     implementation project(":ocs-plugins-shared-lib")
-    implementation "com.vector.ocs:ocs-interop:$vOcsCore"
 }
 
 buildConfig {

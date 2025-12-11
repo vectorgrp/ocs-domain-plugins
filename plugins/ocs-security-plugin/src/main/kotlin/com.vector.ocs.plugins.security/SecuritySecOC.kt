@@ -36,15 +36,14 @@
 package com.vector.ocs.plugins.security
 
 import com.vector.cfg.automation.api.ScriptApi
+import com.vector.cfg.model.pai.api.transaction
 import com.vector.ocs.core.api.OcsLogger
-import com.vector.ocs.interop.transactionApi
 import com.vector.ocs.lib.shared.HelperLib.getContainer
 import com.vector.ocs.lib.shared.HelperLib.getContainerList
 import com.vector.ocs.lib.shared.HelperLib.getModule
 import com.vector.ocs.lib.shared.HelperLib.setParam
 
 private val project = ScriptApi.getActiveProject()
-private val transactionApi = project.transactionApi
 private val secOCCfg = project.getModule("/MICROSAR/SecOC")
 
 /**
@@ -52,7 +51,7 @@ private val secOCCfg = project.getModule("/MICROSAR/SecOC")
  * @param logger Logger for logging messages
  */
 internal fun setRxAuthServiceConfigRef(logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         secOCCfg.getContainerList("SecOCRxPduProcessing").forEachIndexed { index, secOCPdu ->
             createCsmJob("CsmJob_CmacVerify_$index", "CsmKey_Cmac", "CsmPrimitive_CmacVerify", "CsmQueue_CmacVerify", logger)
             secOCPdu.setParam("SecOCRxAuthServiceConfigRef", "/ActiveEcuC/Csm/CsmJobs/CsmJob_CmacVerify_$index")
@@ -66,7 +65,7 @@ internal fun setRxAuthServiceConfigRef(logger: OcsLogger) {
  * @param logger Logger for logging messages
  */
 internal fun setTxAuthServiceConfigRef(logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         secOCCfg.getContainerList("SecOCTxPduProcessing").forEachIndexed { index, secOCPdu ->
             createCsmJob("CsmJob_CmacGenerate_$index", "CsmKey_Cmac", "CsmPrimitive_CmacGenerate", "CsmQueue_CmacGenerate", logger)
             secOCPdu.setParam("SecOCTxAuthServiceConfigRef", "/ActiveEcuC/Csm/CsmJobs/CsmJob_CmacGenerate_$index")
@@ -82,7 +81,7 @@ internal fun setTxAuthServiceConfigRef(logger: OcsLogger) {
  */
 internal fun setQueryFreshnessValue(queryFreshnessValue: String, logger: OcsLogger) {
     val secOCGeneral = secOCCfg.getContainer("SecOCGeneral")
-    transactionApi.transaction {
+    project.transaction {
         if (queryFreshnessValue == "RTE" || queryFreshnessValue == "CFUNC") {
             secOCGeneral?.setParam("SecOCQueryFreshnessValue", queryFreshnessValue)
             logger.info("Set Query Freshness Value to $queryFreshnessValue.")

@@ -36,7 +36,6 @@
 
 package com.vector.ocs.plugins.ecustatemanagement
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import com.vector.ocs.core.api.ModelValidationException
 import com.vector.ocs.core.api.PluginModel
 import com.vector.ocs.json.api.SchemaDescription
@@ -53,6 +52,9 @@ data class EcuStateManagementModel(
     @SchemaDescription("Particular definition of Sub-Features for every Communication channel separately. If not defined, all Sub-Features are enabled if possible.")
     @EncodeDefault
     val AutoConfig_CC_CChannels: Set<AutoConfig_CC_Channel>? = emptySet(),
+    @SchemaDescription("Enable a non-TLS DoIP connection.")
+    @EncodeDefault
+    val AutoConfig_CC_NonTls_DoIp_Connection_Enabled: Boolean = false,
     @SchemaDescription("Enable Ecu State Handling Auto Configuration.")
     @EncodeDefault
     val AutoConfig_EcuStateHandling_Enabled: Boolean = true,
@@ -94,7 +96,7 @@ data class EcuStateManagementModel(
     }
 }
 
-private const val VERSION = 3
+private const val VERSION = 4
 
 private fun <T, K> Collection<T>.checkUnique(message: String, selector: (T) -> K) {
     if (asSequence().distinctBy(selector).count() != size) throw ModelValidationException(message)

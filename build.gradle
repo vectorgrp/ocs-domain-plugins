@@ -1,9 +1,11 @@
 // Define used (gradle) plugins
 plugins {
     id 'base'
-    id 'org.jetbrains.kotlin.jvm' version '2.0.21' apply false
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.0.21' apply false
+    id 'org.jetbrains.kotlin.jvm' version '2.1.21' apply false
+    id "org.jetbrains.kotlin.plugin.sam.with.receiver" version "2.0.21"
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.1.21' apply false
     id 'com.github.gmazzo.buildconfig' version '4.1.2' apply false
+    id "com.vector.cfg.pai.automation-build-gradle" version "1.+" apply false
 }
 
 // Define the group for all built artifacts

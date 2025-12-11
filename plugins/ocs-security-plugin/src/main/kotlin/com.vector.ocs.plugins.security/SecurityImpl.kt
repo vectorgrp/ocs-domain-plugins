@@ -36,16 +36,14 @@
 package com.vector.ocs.plugins.security
 
 import com.vector.cfg.automation.api.ScriptApi
+import com.vector.cfg.model.pai.api.transaction
+import com.vector.cfg.validation.pai.validation
 import com.vector.ocs.core.api.OcsLogger
-import com.vector.ocs.interop.transactionApi
-import com.vector.ocs.interop.validationApi
 import com.vector.ocs.lib.shared.HelperLib.getContainerList
 import com.vector.ocs.lib.shared.HelperLib.getModule
 import com.vector.ocs.lib.shared.PluginsCommon
 
 private val project = ScriptApi.getActiveProject()
-private val transactionApi = project.transactionApi
-private val validationApi = project.validationApi
 
 internal class SecurityConfig {
     companion object {
@@ -54,6 +52,7 @@ internal class SecurityConfig {
          * @param model input for the processing of the configuration elements
          * @param logger logger instance for OCS specific logging
          */
+        @JvmStatic
         fun runConfiguration(model: SecurityModel, logger: OcsLogger) {
             /* Configure Csm and Crypto_30_LibCv */
             if (PluginsCommon.DefRefPresent(project, "/MICROSAR/Crypto_30_LibCv/Crypto", logger) &&
@@ -135,8 +134,9 @@ internal class SecurityConfig {
         /**
          * Cleanup function. Called in the Cleanup Phase to set Dest Pdu Data Provision for SecOC Pdus and du a full Swc description build
          */
+        @JvmStatic
         fun cleanup() {
-            validationApi.validation.validationResults.forEach { validationResult ->
+            project.validation.validationResults.forEach { validationResult ->
                 if((validationResult.id.id == 10510) && (validationResult.id.origin == "PDUR")) {
                     validationResult.solvingActions.forEach { sa ->
                         if (sa.description.contains("PDUR_DIRECT") && validationResult.isActive) {
@@ -165,7 +165,7 @@ internal class SecurityConfig {
 private fun findKeyTypeName(name: String) : String {
     val cryptoCfg =  project.getModule("/MICROSAR/Crypto_30_LibCv/Crypto")
     var cryptoKeyTypeName = ""
-    transactionApi.transaction {
+    project.transaction {
         val cryptoKeyTypeList = cryptoCfg.getContainerList("CryptoKeyTypes/CryptoKeyType")
         cryptoKeyTypeList.forEach {
             if (name.contains(it.name, ignoreCase = true)) {

@@ -38,10 +38,10 @@ package com.vector.ocs.plugins.ecustatemanagement.communicationcontrol
 
 import com.vector.cfg.automation.api.ScriptApi
 import com.vector.cfg.automation.model.ecuc.microsar.comm.ComM
-import com.vector.cfg.dom.modemgt.groovy.api.IModeManagementApi
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationApi
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationFeature
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationParameter
+import com.vector.cfg.dom.deprecated.modemgt.pai.api.IModeManagementApi
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationApi
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationFeature
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationParameter
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIContainer
 import com.vector.ocs.core.api.OcsLogger
 import com.vector.ocs.plugins.ecustatemanagement.AutoConfig_CC_Channel
@@ -54,7 +54,7 @@ import com.vector.ocs.plugins.ecustatemanagement.Feature
  */
 class CommunicationControlDomain extends EcuStateManagementDomain {
     List<CommunicationControlFeature> channels = []
-
+    Boolean nonTlsDoIpConnection = false
     /**
      * The method gets all channels, PNCs, Schedules, comIPduGroups from the configuration and save it in a data model.
      * After that the JSON configuration is applied to this data model.
@@ -63,10 +63,15 @@ class CommunicationControlDomain extends EcuStateManagementDomain {
      */
     @Override
     void initializeDomainFeatures(EcuStateManagementModel model, IModeManagementApi modeMngt, MIContainer bswMCfg) {
-        modeMngt.bswMAutoConfig(bswMCfg, "Communication Control") {
+        modeMngt.bswMAutoConfig("Communication Control") {
             // Get all channels, PNCs and IPdu Groups
             for (rootFeature in rootFeatures) { // Loop over all channels/rootFeatures
-                CommunicationControlFeature channel = createCommunicationControlFeature(getIdentifier(rootFeature.identifier))
+                String rootFeatureIdentifier = getIdentifier(rootFeature.identifier)
+                if (rootFeatureIdentifier.contains("Non-TLS DoIP connection")) {
+                    nonTlsDoIpConnection = model.autoConfig_CC_NonTls_DoIp_Connection_Enabled
+                    return // continue with next iteration
+                }
+                CommunicationControlFeature channel = createCommunicationControlFeature(rootFeatureIdentifier)
                 // If the channel has the bus type internal or the channel is no channel at all (faulty configuration)
                 // then the channel will be null.
                 if (channel != null) {
@@ -207,9 +212,14 @@ class CommunicationControlDomain extends EcuStateManagementDomain {
      */
     @Override
     void processDomainFeatures(EcuStateManagementModel model, OcsLogger logger, IModeManagementApi modeMngt, MIContainer bswMCfg) {
-        modeMngt.bswMAutoConfig(bswMCfg, "Communication Control") { autoConfigApi ->
+        modeMngt.bswMAutoConfig("Communication Control") { autoConfigApi ->
             rootFeatures.each { IBswMAutoConfigurationFeature rootFeature ->
-                CommunicationControlFeature channel = channels.find { getIdentifier(rootFeature.identifier).contains(it.name) }
+                String rootFeatureIdentifier = getIdentifier(rootFeature.identifier)
+                if (rootFeatureIdentifier.contains("Non-TLS DoIP connection") && nonTlsDoIpConnection) {
+                    activateFeature(autoConfigApi, rootFeatureIdentifier, logger)
+                    return // continue with next iteration
+                }
+                CommunicationControlFeature channel = channels.find { rootFeatureIdentifier.contains(it.name) }
                 if (channel?.isActivated && model.autoConfig_CC_Enabled) {
                     activateFeature(autoConfigApi, rootFeature.identifier, logger)
                     rootFeature.subFeatures.each { IBswMAutoConfigurationFeature subFeature ->

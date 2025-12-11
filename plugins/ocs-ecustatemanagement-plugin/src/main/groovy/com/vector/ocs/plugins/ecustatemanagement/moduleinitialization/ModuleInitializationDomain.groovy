@@ -37,9 +37,9 @@
 
 package com.vector.ocs.plugins.ecustatemanagement.moduleinitialization
 
-import com.vector.cfg.dom.modemgt.groovy.api.IModeManagementApi
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationDomain
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationFeature
+import com.vector.cfg.dom.deprecated.modemgt.pai.api.IModeManagementApi
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationDomain
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationFeature
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIContainer
 import com.vector.ocs.core.api.OcsLogger
 import com.vector.ocs.plugins.ecustatemanagement.EcuStateManagementDomain

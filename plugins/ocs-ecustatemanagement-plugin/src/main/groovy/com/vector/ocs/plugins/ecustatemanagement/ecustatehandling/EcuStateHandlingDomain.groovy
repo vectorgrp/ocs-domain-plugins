@@ -39,11 +39,11 @@ package com.vector.ocs.plugins.ecustatemanagement.ecustatehandling
 
 import com.vector.cfg.automation.api.ScriptApi
 import com.vector.cfg.automation.model.ecuc.microsar.ecum.EcuM
-import com.vector.cfg.dom.modemgt.groovy.api.IModeManagementApi
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationApi
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationDomain
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationFeature
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationParameter
+import com.vector.cfg.dom.deprecated.modemgt.pai.api.IModeManagementApi
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationApi
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationDomain
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationFeature
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationParameter
 import com.vector.cfg.gen.core.bswmdmodel.param.GBoolean
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIContainer
 import com.vector.ocs.core.api.OcsLogger
@@ -57,7 +57,7 @@ class EcuStateHandlingDomain extends EcuStateManagementDomain {
     @Override
     void initializeDomainFeatures(EcuStateManagementModel model, IModeManagementApi modeMgmt, MIContainer bswMCfg) {
 
-        IBswMAutoConfigurationDomain eshDomain = modeMgmt.bswMAutoConfigDomain(bswMCfg, "Ecu State Handling")
+        IBswMAutoConfigurationDomain eshDomain = modeMgmt.bswMAutoConfigDomain("Ecu State Handling")
 
         // Store the activate/deactivate state of the Ecu State Handling domain according to the json setting. Default = true
         ecuStateHandlingDataModel = new EcuStateMachineFeature("Ecu State Machine", model.autoConfig_EcuStateHandling_Enabled)
@@ -73,7 +73,7 @@ class EcuStateHandlingDomain extends EcuStateManagementDomain {
         GBoolean ecuMModeHandling = ecumModule.ecuMFlexGeneralOrCreate.ecuMModeHandlingOrCreate
         // This Basic Editor parameter must be activated for "EcuM Mode Handling" to be enabled in the autoconfig domain
         ecuMModeHandling.value = ecuStateHandlingDataModel.ecumModeHandling
-        IBswMAutoConfigurationDomain eshDomain = modeMgmt.bswMAutoConfigDomain(bswMCfg, "Ecu State Handling")
+        IBswMAutoConfigurationDomain eshDomain = modeMgmt.bswMAutoConfigDomain("Ecu State Handling")
         IBswMAutoConfigurationFeature ecuStateMachine = eshDomain.getRootFeatures().getFirst()
         IBswMAutoConfigurationFeature demHandlingFeature = getSubfeatureByName(ecuStateMachine, "Dem Handling")
         IBswMAutoConfigurationFeature supportComMFeature = getSubfeatureByName(ecuStateMachine, "Support ComM")
@@ -89,7 +89,7 @@ class EcuStateHandlingDomain extends EcuStateManagementDomain {
         IBswMAutoConfigurationParameter nvmWriteAllTimeoutParameter = getParameterByName(nvmHandlingFeature, "NvM Write All Timeout")
         IBswMAutoConfigurationParameter nvmCancelWriteAllTimeoutParameter = getParameterByName(nvmHandlingFeature, "NvM Cancel Write All Timeout")
 
-        modeMgmt.bswMAutoConfig(bswMCfg, eshDomain.identifier) { autoConfigApi ->
+        modeMgmt.bswMAutoConfig(eshDomain.identifier) { autoConfigApi ->
             if (ecuStateHandlingDataModel.isActivated == true) {
                 // Activate the root feature Ecu State Machine: It is needed to activate it before
                 // processing the sub-features due to missing references of BswMModeControl

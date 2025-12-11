@@ -1,0 +1,46 @@
+// Test code and production code is in separated modules
+
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'com.github.gmazzo.buildconfig'
+
+dependencies {
+    testImplementation project(":ocs-diagnostics-plugin")
+    testImplementation "com.vector.ocs:ocs-core-api:$vOcsCore"
+
+    testImplementation "io.mockk:mockk:1.12.0"
+    testImplementation "org.mockito:mockito-core:5.11.0"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:2.1.21"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.10.0"
+    testImplementation "org.jetbrains.kotlin:kotlin-stdlib"
+
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.10.0"
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+buildConfig {
+    sourceSets.named("test") {
+        className('TestBuildConfig')
+        packageName('com.vector.ocs.plugins')
+        useKotlinOutput {
+            topLevelConstants = false
+            internalVisibility = true
+        }
+    }
+}
+
+// Use the OSGI wrapper of the kotlin stdlib as shipped with the dvcfgpai libs
+repositories {
+    ivy {
+        url = file(cfg6 + "/dvcfgpai/libs")
+        patternLayout {
+            artifact '[artifact]-[revision](-[classifier])(.[ext])'
+        }
+        metadataSources.artifact()
+    }
+}
+dependencies {
+    testImplementation group: 'com.vector.cfg.pai.msr', name: 'kotlin-osgi-bundle', version: '+'
+}

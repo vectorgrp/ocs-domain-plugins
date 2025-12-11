@@ -1,5 +1,3 @@
-package com.vector.ocs.lib.shared
-
 /**********************************************************************************************************************
  *  COPYRIGHT
  *  -------------------------------------------------------------------------------------------------------------------
@@ -44,27 +42,33 @@ package com.vector.ocs.lib.shared
  *                - delete: Deletes a container or parameter value.
  *
  *********************************************************************************************************************/
+package com.vector.ocs.lib.shared
+
 import com.vector.cfg.automation.api.ScriptApi
 import com.vector.cfg.automation.scripting.api.ScriptClientExecutionException
 import com.vector.cfg.automation.scripting.api.project.IProject
 import com.vector.cfg.model.access.AsrPath
 import com.vector.cfg.model.access.DefRef
-import com.vector.cfg.model.access.ecuconfiguration.IEcuConfigurationAccess
-import com.vector.cfg.model.access.ecuconfiguration.elements.IEcucValueParameter
-import com.vector.cfg.model.access.ecuconfiguration.elements.parameter.IEcucBooleanParameter
-import com.vector.cfg.model.access.ecuconfiguration.elements.parameter.IEcucFloatParameter
-import com.vector.cfg.model.access.ecuconfiguration.elements.parameter.IEcucIntegerParameter
-import com.vector.cfg.model.access.ecuconfiguration.elements.parameter.IEcucTextualParameter
-import com.vector.cfg.model.access.ecuconfiguration.reference.IEcucSimpleReferenceParameter
-import com.vector.cfg.model.exceptions.ModelDefinitionNotFoundException
+import com.vector.cfg.model.asr.ecuc.access.IAsrEcucShortnameAccess
+import com.vector.cfg.model.asr.ecuc.access.IEcucModelAccess
+import com.vector.cfg.model.asr.ecuc.access.ecuconfiguration.IEcuConfigurationAccess
+import com.vector.cfg.model.asr.ecuc.access.ecuconfiguration.elements.IEcucValueParameter
+import com.vector.cfg.model.asr.ecuc.access.ecuconfiguration.elements.parameter.IEcucBooleanParameter
+import com.vector.cfg.model.asr.ecuc.access.ecuconfiguration.elements.parameter.IEcucFloatParameter
+import com.vector.cfg.model.asr.ecuc.access.ecuconfiguration.elements.parameter.IEcucIntegerParameter
+import com.vector.cfg.model.asr.ecuc.access.ecuconfiguration.elements.parameter.IEcucTextualParameter
+import com.vector.cfg.model.asr.ecuc.access.ecuconfiguration.reference.IEcucSimpleReferenceParameter
+import com.vector.cfg.model.asr.ecuc.exceptions.ModelDefinitionNotFoundException
+import com.vector.cfg.model.asr.ecuc.operations.IAsrEcucModelOperations
 import com.vector.cfg.model.mdf.commoncore.autosar.MIReferrable
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIContainer
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIModuleConfiguration
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIParameterValue
 import com.vector.cfg.model.mdf.model.autosar.ecucparamdef.MIModuleDef
-import com.vector.cfg.model.operations.IModelOperationsPublished
+import com.vector.cfg.model.pai.api.activeEcuc
+import com.vector.cfg.model.pai.api.extensions.*
 import com.vector.ocs.core.api.OcsLogger
-import com.vector.ocs.interop.*
+
 import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -107,7 +111,7 @@ object HelperLib {
     fun IProject.getModule(def: String): MIModuleConfiguration {
         // No error handling here. We assume the modules are present as they are checked by .hasModule
         val defRef = DefRef.createModuleDefRefFromString(def, this.projectContext)
-        return this.modelApi.activeEcuc.modules(defRef).first()
+        return this.activeEcuc.modules(defRef).first()
     }
 
     /**
@@ -124,7 +128,7 @@ object HelperLib {
         val possible = unchecked.getPossibleDefinitionsForDefRefWithWildcard(project.projectContext)
 
         return if (possible.isNotEmpty()) {
-            val list = this.modelApi.activeEcuc.modules(unchecked)
+            val list = this.activeEcuc.modules(unchecked)
             (list.isNotEmpty())
         } else {
             false
@@ -168,7 +172,9 @@ object HelperLib {
         }
         return if (this.subContainer(defRef).isEmpty()) {
             val created = try {
-                val local = this.subContainer.createAndAdd(typedDefRef)
+                val shortnameAcc = this.projectContext.getInstance(IAsrEcucShortnameAccess::class.java)
+                val name = shortnameAcc.getValidShortnameForContainer(this, defRef.lastShortname, 3, defRef)
+                val local = this.withSubContainer().create(name, typedDefRef)
                 logger?.info("Created container: $local")
                 local
             } catch (e: ModelDefinitionNotFoundException) {
@@ -199,7 +205,7 @@ object HelperLib {
         val found = this.subContainer(defRef).find { it.name == containerName }
         return if (null == found) {
             val created = try {
-                val local = this.subContainer.createAndAdd(typedDefRef, containerName)
+                val local = this.withSubContainer().create(containerName, typedDefRef)
                 logger?.info("Created container: $local")
                 local
             } catch (e: ModelDefinitionNotFoundException) {
@@ -231,7 +237,9 @@ object HelperLib {
         }
         return if (this.subContainer(defRef).isEmpty()) {
             val created = try {
-                val local = this.subContainer.createAndAdd(typedDefRef)
+                val shortnameAcc = this.projectContext.getInstance(IAsrEcucShortnameAccess::class.java)
+                val name = shortnameAcc.getValidShortnameForContainer(this, defRef.lastShortname, 3, defRef)
+                val local = this.withSubContainer().create(name, typedDefRef)
                 logger?.info("Created container: $local.")
                 local
             } catch (e: ModelDefinitionNotFoundException) {
@@ -262,7 +270,7 @@ object HelperLib {
         val found = this.subContainer(defRef).find { it.name == containerName }
         return if (null == found) {
             val created = try {
-                val local = this.subContainer.createAndAdd(typedDefRef, containerName)
+                val local = this.withSubContainer().create(containerName, typedDefRef)
                 logger?.info("Created container: $local.")
                 local
             } catch (e: ModelDefinitionNotFoundException) {
@@ -414,10 +422,11 @@ object HelperLib {
      */
     @Suppress("unused")
     fun MIContainer.delete() {
-        if (ceState.deletable) {
+        val modelAccess = projectContext.getService(IEcucModelAccess::class.java)
+        if (ceState.isDeletable) {
             logger?.info("Removing container: $this")
             this.moRemove()
-        } else if (derived.isDerived) {
+        } else if (modelAccess.isDerived(this)) {
             logger?.info("Removing derived container: $this.")
             this.moRemove()
         } else {
@@ -518,7 +527,7 @@ object HelperLib {
     @Suppress("unused")
     fun MIContainer.setParam(def: String, value: String, idx: Int) {
         val project = ScriptApi.getActiveProject()
-        val modelOps = project.getInstance(IModelOperationsPublished::class.java)
+        val modelOps = project.getInstance(IAsrEcucModelOperations::class.java)
         val defRef = DefRef.tryCreate(this, def)
         val typedDefRef = defRef?.toTypedContainer()
 
@@ -540,7 +549,7 @@ object HelperLib {
             }
         }
 
-        if (param?.ceState?.changeable == true) {
+        if (param?.ceState?.isChangeable == true) {
             param.setValue(value)
         } else {
             logger?.warn("Could not set parameter $param to $value.")
@@ -590,7 +599,7 @@ object HelperLib {
     private fun MIContainer.findParamOrNull(def: DefRef, idx: Int, value: String): MIParameterValue? {
         val project = ScriptApi.getActiveProject()
         val configAccess = project.getInstance(IEcuConfigurationAccess::class.java)
-        val existing = parameter[def]
+        val existing = parameter(def)
         return when (idx) {
             in existing.indices -> existing[idx]
             existing.lastIndex + 1 -> null
@@ -602,7 +611,7 @@ object HelperLib {
                 when (param) {
                     is IEcucBooleanParameter -> value.toBooleanStrict() == param.value
                     is IEcucIntegerParameter -> value.toBigInteger() == param.value
-                    is IEcucFloatParameter -> value.toBigDecimal().compareTo(param.value) == 0
+                    is IEcucFloatParameter -> value.toDouble().compareTo(param.value) == 0
                     is IEcucTextualParameter -> value == param.value
                     is IEcucSimpleReferenceParameter -> AsrPath.create(value, MIReferrable::class.java) == param.value
                     else -> throw ScriptClientExecutionException("Type of parameter is not supported: $it.")
@@ -625,7 +634,7 @@ object HelperLib {
      */
     @Suppress("unused")
     fun MIParameterValue.delete() {
-        if (ceState.deletable) {
+        if (ceState.isDeletable) {
             logger?.info("Removing parameter: $this.")
             this.moRemove()
         } else {
@@ -698,7 +707,7 @@ object HelperLib {
         when (val param = configAccess.cfg(this)) {
             is IEcucBooleanParameter -> param.set(value.toBooleanStrict(), this)
             is IEcucIntegerParameter -> param.set(value.toBigInteger(), this)
-            is IEcucFloatParameter -> param.set(value.toBigDecimal(), this)
+            is IEcucFloatParameter -> param.set(value.toDouble(), this)
             is IEcucTextualParameter -> param.set(value, this)
             is IEcucSimpleReferenceParameter -> param.set(AsrPath.create(value, MIReferrable::class.java), this)
             else -> logger?.warn("Type of parameter is not supported, parameter will not be modified: $this.")
@@ -713,7 +722,7 @@ object HelperLib {
      * @return value
      */
     @Suppress("UNUSED_PARAMETER")
-    private fun <T> IEcucValueParameter<T>.get(original: MIParameterValue): T? {
+    private fun <T: Any> IEcucValueParameter<T>.get(original: MIParameterValue): T? {
         return if (hasValue()) value else {
             logger?.warn("Reading Parameter $this without any value.")
             null
@@ -727,9 +736,9 @@ object HelperLib {
      * @param new value
      * @param original parameter
      */
-    private fun <T> IEcucValueParameter<T>.set(new: T, original: MIParameterValue) {
+    private fun <T : Any> IEcucValueParameter<T>.set(new: T, original: MIParameterValue) {
         if (!hasValue()) {
-            value = new
+            setValue(new)
             logger?.info("Set value of parameter: $original.")
             return
         }
@@ -742,7 +751,7 @@ object HelperLib {
         if (same) {
             return
         }
-        value = new
+        setValue(new)
         logger?.info("Updated value of parameter: $original.")
     }
 
@@ -753,11 +762,10 @@ object HelperLib {
      * @param path path of the project
      * @return file path
      */
-    @Suppress("unused")
     fun getPath(base: BasePath, path: String): Path? {
         val paths = ScriptApi.scriptCode().scriptContext.paths
         val filePath = when (base) {
-            BasePath.SIP -> paths.resolveSipPath(path)
+            BasePath.SIP -> paths.resolveBswPackagePath(path)
             BasePath.DPA -> paths.resolveProjectPath(path)
         } ?: return null
         if (!(filePath.exists())) {
@@ -773,11 +781,10 @@ object HelperLib {
      * @param path path of the project
      * @return file object
      */
-    @Suppress("unused")
     fun getFileFromPath(base: BasePath, path: String): File? {
         val paths = ScriptApi.scriptCode().scriptContext.paths
         val filePath = when (base) {
-            BasePath.SIP -> paths.resolveSipPath(path)
+            BasePath.SIP -> paths.resolveBswPackagePath(path)
             BasePath.DPA -> paths.resolveProjectPath(path)
         } ?: return null
         if (!(filePath.exists())) {
@@ -789,16 +796,5 @@ object HelperLib {
         }
         return file
     }
-
-    /**
-     * Check if the MIContainer is derived
-     *
-     * @return true if the container is derived, false otherwise
-     */
-    @Suppress("unused")
-    fun MIContainer.isDerived(): Boolean {
-        return this.derived.isDerived
-    }
-
     // End region
 }

@@ -35,8 +35,6 @@
  *********************************************************************************************************************/
 package com.vector.ocs.plugins.diagnostics.constants
 
-import com.vector.ocs.lib.shared.PluginsCommon
-
 abstract class DcmDefRefs {
     /** R31 */
     open var DCM: String = "/MICROSAR/Dcm"
@@ -76,7 +74,7 @@ abstract class DcmDefRefs {
         }
     }
 
-    open class DcmDefRefsR31 : DcmDefRefs() {
+    open class DcmDefRefsR35 : DcmDefRefs() {
         init {
 
         }
@@ -84,11 +82,7 @@ abstract class DcmDefRefs {
 
     object DcmDefRefConstantsFactory {
         fun getConstants(): DcmDefRefs {
-            val minorVersion = PluginsCommon.Cfg5MinorVersion()
-            return when {
-                minorVersion.toInt() >= 28 -> DcmDefRefsR31()
-                else -> throw IllegalArgumentException("Unknown version: $minorVersion")
-            }
+            return DcmDefRefsR35()
         }
     }
 }

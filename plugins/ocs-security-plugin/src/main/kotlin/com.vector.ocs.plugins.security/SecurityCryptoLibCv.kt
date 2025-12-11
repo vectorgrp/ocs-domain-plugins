@@ -37,8 +37,8 @@
 package com.vector.ocs.plugins.security
 
 import com.vector.cfg.automation.api.ScriptApi
+import com.vector.cfg.model.pai.api.transaction
 import com.vector.ocs.core.api.OcsLogger
-import com.vector.ocs.interop.transactionApi
 import com.vector.ocs.lib.shared.HelperLib.createOrGetContainer
 import com.vector.ocs.lib.shared.HelperLib.delete
 import com.vector.ocs.lib.shared.HelperLib.getContainer
@@ -48,7 +48,6 @@ import com.vector.ocs.lib.shared.HelperLib.getValueString
 import com.vector.ocs.lib.shared.HelperLib.setParam
 
 private val project = ScriptApi.getActiveProject()
-private val transactionApi = project.transactionApi
 private val cryptoCfg = project.getModule("/MICROSAR/Crypto_30_LibCv/Crypto")
 
 /**
@@ -58,7 +57,7 @@ private val cryptoCfg = project.getModule("/MICROSAR/Crypto_30_LibCv/Crypto")
  * @param logger Logger for logging messages
  */
 internal fun createCryptoKey(name: String, keyType: String, logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         val cryptoKeys = cryptoCfg.createOrGetContainer("CryptoKeys")
         val cryptoKeyCfg = cryptoKeys?.createOrGetContainer("CryptoKey", name)
         cryptoKeyCfg?.setParam("CryptoKeyTypeRef", "/ActiveEcuC/Crypto/CryptoKeyTypes/$keyType")
@@ -73,7 +72,7 @@ internal fun createCryptoKey(name: String, keyType: String, logger: OcsLogger) {
  * @param logger Logger for logging messages
  */
 internal fun addPrimitiveRef(name: String, primitiveRef: String, logger: OcsLogger) {
-    transactionApi.transaction {
+    project.transaction {
         val cryptoDriverObject = cryptoCfg.getContainer("CryptoDriverObjects/CryptoDriverObject", name)
         if (cryptoDriverObject?.getParameterList("CryptoPrimitiveRef")?.elementAt(0)?.getValueString() == null) {
             cryptoDriverObject?.getParameterList("CryptoPrimitiveRef")?.elementAt(0)?.delete()

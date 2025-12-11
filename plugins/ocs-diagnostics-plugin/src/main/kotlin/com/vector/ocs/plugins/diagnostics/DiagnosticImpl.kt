@@ -54,6 +54,7 @@ internal class DiagnosticImpl {
          * @param model DiagnosticsModel object
          * @param ocsLogger OcsLogger object
          */
+        @JvmStatic
         fun runConfiguration(model: DiagnosticsModel, ocsLogger: OcsLogger) {
             if (PluginsCommon.ConfigPresent(dcmDefRefs.DCM)) {
                 // Initialize adapters

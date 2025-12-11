@@ -55,7 +55,7 @@ abstract class ComMDefRefs {
         }
     }
 
-    open class ComMDefRefsR31 : ComMDefRefs() {
+    open class ComMDefRefsR35 : ComMDefRefs() {
         init {
 
         }
@@ -63,11 +63,7 @@ abstract class ComMDefRefs {
 
     object ComMDefRefConstantsFactory {
         fun getConstants(): ComMDefRefs {
-            val minorVersion = PluginsCommon.Cfg5MinorVersion()
-            return when {
-                minorVersion.toInt() >= 28 -> ComMDefRefsR31()
-                else -> throw IllegalArgumentException("Unknown version: $minorVersion")
-            }
+            return ComMDefRefsR35()
         }
     }
 }

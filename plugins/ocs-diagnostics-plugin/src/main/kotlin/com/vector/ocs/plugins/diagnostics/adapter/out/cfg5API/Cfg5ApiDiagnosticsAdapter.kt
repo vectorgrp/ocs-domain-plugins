@@ -39,8 +39,9 @@ package com.vector.ocs.plugins.diagnostics.adapter.out.cfg5API
 import com.vector.ocs.lib.shared.Cfg5Client
 import com.vector.cfg.automation.model.ecuc.microsar.dem.demgeneral.demfreezeframerecordclass.demfreezeframerecordupdate.EDemFreezeFrameRecordUpdate
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIContainer
+import com.vector.cfg.model.pai.api.extensions.ceState
+import com.vector.cfg.model.pai.api.extensions.isChangeable
 import com.vector.ocs.core.api.OcsLogger
-import com.vector.ocs.interop.derived
 import com.vector.ocs.plugins.diagnostics.ComM.ComMChannel
 import com.vector.ocs.lib.shared.Cfg5Client.createContainer
 import com.vector.ocs.lib.shared.Cfg5Client.createContainerUnderModule
@@ -168,7 +169,7 @@ class Cfg5ApiDiagnosticsAdapter : ConfigServiceAPI {
     private fun writeDebouncingStrategy(demEventParameterList: MutableList<DemEventParameter>, logger: OcsLogger) {
 
         for (demEventParameter in demEventParameterList) {
-            var isDerived = false
+            var isNotChangeable = false
             val algorithmClassContainer =
                 Cfg5Client.getContainer(demDefRefs.DEM_EVENT_PARAMETER, demEventParameter.shortName, logger)
                     ?.getChildContainer(demDefRefs.DEM_EVENT_CLASS, demEventParameter.demEventClass.shortName)
@@ -190,14 +191,14 @@ class Cfg5ApiDiagnosticsAdapter : ConfigServiceAPI {
             if (childContainerList.size > 0) {
                 // Delete all children if they are not derived
                 childContainerList.forEach {
-                    if (!it.derived.isDerived) {
+                    if (it.ceState.isChangeable) {
                         deleteContainer(it)
                     } else {
-                        isDerived = true
+                        isNotChangeable = true
                     }
                 }
             }
-            if (!isDerived) {
+            if (!isNotChangeable) {
                 if (demEventParameter.demEventClass.demDebounceAlgorithmClass.demDebounceCounterBased != null) {
                     algorithmClassContainer?.createOrGetChildContainer(
                         demDefRefs.DEM_DEBOUNCE_COUNTER_BASED,
