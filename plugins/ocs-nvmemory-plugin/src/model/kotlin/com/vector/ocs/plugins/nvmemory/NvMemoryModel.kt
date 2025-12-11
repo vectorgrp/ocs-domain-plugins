@@ -42,7 +42,7 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 
-private const val VERSION = 4
+private const val VERSION = 5
 
 @Serializable
 data class NvMemoryModel(
@@ -61,9 +61,9 @@ data class NvMemoryModel(
     @SchemaDescription("Activation of NvM Stack related Modules (NvM, Fee, Fls, Ea, Crc, MemIf). First priority: MICROSAR Fee and Fls. Second priority: Infineon Fee/Fls. Third priority: MICROSAR Ea.")
     @EncodeDefault
     val activateMemModules: ActivationModel? = ActivationModel(
-        activateMicrosarFeeFls = true,
+        activateMicrosarFeeFls = false,
         activateAurixFeeFls = false,
-        activateMicrosarFeeFlexNorFls = false,
+        activateMicrosarFeeFlexNorFls = true,
         activateMicrosarEaEep = false
     ),
     @SchemaDescription("Activation of the modules Fls_30_vMemAccM/Eep_30_vMemAccM, vMemAccM, vMem and Configuration of the vMem Solution.")

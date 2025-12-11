@@ -45,8 +45,8 @@ import com.vector.cfg.automation.model.ecuc.microsar.vset.vsetbswinitialization.
 import com.vector.cfg.automation.model.ecuc.microsar.vtt.vtteep.VTTEep
 import com.vector.cfg.automation.model.ecuc.microsar.vtt.vttfls.VTTFls
 import com.vector.cfg.automation.model.ecuc.microsar.vtt.vttvset.VTTvSet
-import com.vector.cfg.consistency.ui.ISolvingActionUI
-import com.vector.cfg.consistency.ui.IValidationResultUI
+import com.vector.cfg.consistency.requester.IValidationResultUI
+import com.vector.cfg.consistency.requester.solvingaction.ISolvingActionUI
 import com.vector.cfg.model.mdf.commoncore.autosar.MIReferrable
 import com.vector.ocs.core.api.OcsLogger
 import com.vector.ocs.lib.shared.PluginsCommon
@@ -68,7 +68,7 @@ class NvMemorySolvingActions {
     static void solveNvMemory(OcsLogger logger) {
         ScriptApi.activeProject { prj ->
             ScriptApi.scriptCode {
-                validation {
+               validation {
                     validationResults.each { IValidationResultUI validation_result ->
                         if ((validation_result.id.id == 150) && validation_result.id.origin == "FEE") {
                             validation_result.solvingActions.each { ISolvingActionUI solving_action ->

@@ -80,16 +80,11 @@ class FeeFlexNor extends GeneralFee {
             ScriptApi.scriptCode {
                 activeEcuc.allModules.each { MIModuleConfiguration active_module ->
                     if (active_module.name == "Fee") {
-                        if(PluginsCommon.Cfg5MinorVersion() >= NvMemoryConstants.CFG5_VERSION_R32)
-                        {
-                            transaction {
-                                def FeePartitionConfigurationBlock = active_module.bswmdModel().feePartitionConfiguration.byNameOrCreate("FeePartitionConfiguration")
-                                FeePartitionConfigurationBlock.each { fb ->
-                                    fb.feePartitionTargetOrCreate.setRefTargetMdf(flsConfigSet)
-                                }
+                        transaction {
+                            def FeePartitionConfigurationBlock = active_module.bswmdModel().feePartitionConfiguration.byNameOrCreate("FeePartitionConfiguration")
+                            FeePartitionConfigurationBlock.each { fb ->
+                                fb.feePartitionTargetOrCreate.setRefTargetMdf(flsConfigSet)
                             }
-                        } else {
-                            super.assignFeePartitionDeviceIndex(flsConfigSet)
                         }
                     }
                 }
