@@ -1,5 +1,3 @@
-package com.vector.ocs.lib.shared
-
 /**********************************************************************************************************************
  *  COPYRIGHT
  *  -------------------------------------------------------------------------------------------------------------------
@@ -42,11 +40,16 @@ package com.vector.ocs.lib.shared
  *
  *
  *********************************************************************************************************************/
+package com.vector.ocs.lib.shared
+
 import com.vector.cfg.automation.api.ScriptApi
+import com.vector.cfg.gen.core.genusage.pai.api.generation
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIContainer
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIParameterValue
+import com.vector.cfg.model.pai.api.transaction
+import com.vector.cfg.validation.pai.validation
+
 import com.vector.ocs.core.api.OcsLogger
-import com.vector.ocs.interop.*
 import com.vector.ocs.lib.shared.HelperLib.createOrGetContainer
 import com.vector.ocs.lib.shared.HelperLib.delete
 import com.vector.ocs.lib.shared.HelperLib.getContainer
@@ -61,7 +64,6 @@ import com.vector.ocs.lib.shared.HelperLib.setParam
 @Suppress("unused")
 object Cfg5Client {
     private val project = ScriptApi.getActiveProject()
-    private val transactionApi = project.transactionApi
 
     /**
      * Create container
@@ -80,7 +82,7 @@ object Cfg5Client {
     ) {
         val moduleDefRef = extractModuleDefRef(parentDefRef)
         if (moduleDefRef != null) {
-            transactionApi.transaction {
+            project.transaction {
                 val currentModule = project.getModule(moduleDefRef)
                 val parentContainer = currentModule.getContainer(removeMicrosarSubstring(parentDefRef))
                 parentContainer?.createOrGetContainer(removeMicrosarSubstring(defRef), shortName)
@@ -104,7 +106,7 @@ object Cfg5Client {
     ) {
         val moduleDefRef = extractModuleDefRef(defRef)
         if (moduleDefRef != null) {
-            transactionApi.transaction {
+            project.transaction {
                 val currentModule = project.getModule(moduleDefRef)
                 currentModule.createOrGetContainer(removeMicrosarSubstring(defRef), shortName)
             }
@@ -188,8 +190,8 @@ object Cfg5Client {
         shortName: String
     ): MIContainer? {
         var container: MIContainer? = null
-        transactionApi.transaction {
-            container = this.createOrGetContainer(removeMicrosarSubstring(defRef), shortName)
+        project.transaction {
+            container = this@createOrGetChildContainer.createOrGetContainer(removeMicrosarSubstring(defRef), shortName)
         }
         return container
     }
@@ -228,7 +230,7 @@ object Cfg5Client {
      */
     @Suppress("unused")
     fun setParameter(containerShortName: String, parameterDefRef: String, value: Boolean, logger: OcsLogger) {
-        transactionApi.transaction {
+        project.transaction {
             val moduleDefRef = extractModuleDefRef(parameterDefRef)
             if (moduleDefRef != null) {
                 val currentModule = project.getModule(moduleDefRef)
@@ -255,7 +257,7 @@ object Cfg5Client {
      */
     @Suppress("unused")
     fun setParameter(containerShortName: String, parameterDefRef: String, value: Long, logger: OcsLogger) {
-        transactionApi.transaction {
+        project.transaction {
             val moduleDefRef = extractModuleDefRef(parameterDefRef)
             if (moduleDefRef != null) {
                 val currentModule = project.getModule(moduleDefRef)
@@ -282,7 +284,7 @@ object Cfg5Client {
      */
     @Suppress("unused")
     fun setParameter(containerShortName: String, parameterDefRef: String, value: Float, logger: OcsLogger) {
-        transactionApi.transaction {
+        project.transaction {
             val moduleDefRef = extractModuleDefRef(parameterDefRef)
             if (moduleDefRef != null) {
                 val currentModule = project.getModule(moduleDefRef)
@@ -308,7 +310,7 @@ object Cfg5Client {
      */
     @Suppress("unused")
     fun setParameter(containerShortName: String, parameterDefRef: String, value: Int, logger: OcsLogger) {
-        transactionApi.transaction {
+        project.transaction {
             val moduleDefRef = extractModuleDefRef(parameterDefRef)
             if (moduleDefRef != null) {
                 val currentModule = project.getModule(moduleDefRef)
@@ -336,7 +338,7 @@ object Cfg5Client {
      */
     @Suppress("unused")
     fun setParameter(containerShortName: String, parameterDefRef: String, value: String, logger: OcsLogger) {
-        transactionApi.transaction {
+        project.transaction {
             val moduleDefRef = extractModuleDefRef(parameterDefRef)
             if (moduleDefRef != null) {
                 val currentModule = project.getModule(moduleDefRef)
@@ -417,7 +419,7 @@ object Cfg5Client {
      */
     @Suppress("unused")
     fun validate(vararg modules: String) {
-        val generation = project.generationApi.generation
+        val generation = project.generation
         generation.settings.deselectAll()
         for (module in modules) {
             generation.settings.selectGeneratorByDefRef(module)
@@ -435,7 +437,7 @@ object Cfg5Client {
     fun solve(
         validationOrigin: String, validationId: Int, logger: OcsLogger
     ) {
-        project.validationApi.validation.validationResults.forEach { validationResult ->
+        project.validation.validationResults.forEach { validationResult ->
             if ((validationResult.id.id == validationId) && (validationResult.id.origin == validationOrigin)) {
                 validationResult.solvingActions.forEach { sa ->
                     if (validationResult.isActive) {
@@ -499,7 +501,7 @@ object Cfg5Client {
      */
     @Suppress("unused")
     fun deleteContainer(container: MIContainer) {
-        transactionApi.transaction {
+        project.transaction {
             container.delete()
         }
     }
