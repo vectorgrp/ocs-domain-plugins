@@ -1,16 +1,42 @@
+pluginManagement {
+    repositories {
+        // TODO either use gradlePluginPortal() or replace with URL to mirror
+        if (!settings.hasProperty('pluginPortalRepo')) {
+            gradlePluginPortal()
+        } else {
+            maven {
+                url = settings.getProperty('pluginPortalRepo')
+            }
+        }
+        maven {
+            // for accessing com.vector.cfg.pai.automation-build-gradle
+            // TODO either use Vector public Maven repository or replace with URL to mirror
+            if (!settings.hasProperty('paiRepo')) {
+                url = 'https://packages.vehub.vector.com/maven'
+            } else {
+                url = settings.getProperty('paiRepo')
+            }
+        }
+    }
+}
+
 rootProject.name = 'ocs-plugins'
 
-//Adding the plugins as project directories to include in the gradle build structure
+// Adding the plugins as project directories to include in the gradle build structure
 [
     'ocs-plugins-shared-lib',
     'ocs-communication-plugin',
     'ocs-diagnostics-plugin',
+    'ocs-diagnostics-plugin-test',
     'ocs-ecustatemanagement-plugin',
-    'ocs-nvmemory-plugin',
     'ocs-runtimesystem-plugin',
+    'ocs-nvmemory-plugin',
     'ocs-security-plugin'
 ].each {
     String name = ':' + it
     include(name)
     project(name).projectDir = file('plugins/' + it)
 }
+
+// Handle BSWMD dependencies
+include ':_bswmd'
