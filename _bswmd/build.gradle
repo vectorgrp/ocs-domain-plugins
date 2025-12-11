@@ -1,4 +1,4 @@
-// workaround for TAR-85183
+// Handle BSWMD dependencies
 
 plugins {
     id 'com.vector.cfg.pai.automation-build-gradle'
