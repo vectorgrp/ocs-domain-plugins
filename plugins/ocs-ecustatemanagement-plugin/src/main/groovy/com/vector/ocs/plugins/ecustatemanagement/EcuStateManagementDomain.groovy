@@ -37,8 +37,8 @@
 
 package com.vector.ocs.plugins.ecustatemanagement
 
-import com.vector.cfg.dom.modemgt.groovy.api.IModeManagementApi
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationApi
+import com.vector.cfg.dom.deprecated.modemgt.pai.api.IModeManagementApi
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationApi
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIContainer
 import com.vector.ocs.core.api.OcsLogger
 
@@ -188,7 +188,7 @@ abstract class EcuStateManagementDomain {
      * @param rfIdentifier Identifier of the feature
      */
     static String getIdentifier(String rfIdentifier) {
-        final Pattern regexPattern = ~'/([a-zA-Z0-9_: ]+)|<span style="color:#.{6}">(.+?)</span>|<b>( \\*warning\\*)</b>'
+        final Pattern regexPattern = ~'/([a-zA-Z0-9_:\\- ]+)|<span style="color:#.{6}">(.+?)</span>|<b>( \\*warning\\*)</b>'
         String returnValue = ""
 
         Matcher matcherResult = (rfIdentifier =~ regexPattern)

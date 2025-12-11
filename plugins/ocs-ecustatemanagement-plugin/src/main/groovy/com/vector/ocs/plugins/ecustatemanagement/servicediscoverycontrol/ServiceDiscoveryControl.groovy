@@ -36,9 +36,9 @@
 
 package com.vector.ocs.plugins.ecustatemanagement.servicediscoverycontrol
 
-import com.vector.cfg.dom.modemgt.groovy.api.IModeManagementApi
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationApi
-import com.vector.cfg.dom.modemgt.groovy.bswm.IBswMAutoConfigurationFeature
+import com.vector.cfg.dom.deprecated.modemgt.pai.api.IModeManagementApi
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationApi
+import com.vector.cfg.dom.deprecated.modemgt.pai.bswm.IBswMAutoConfigurationFeature
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIContainer
 import com.vector.ocs.core.api.OcsLogger
 import com.vector.ocs.plugins.ecustatemanagement.ClientSettings
@@ -62,7 +62,7 @@ class ServiceDiscoveryControl extends EcuStateManagementDomain {
      */
     @Override
     void initializeDomainFeatures(EcuStateManagementModel model, IModeManagementApi modeMngt, MIContainer bswMCfg) {
-        modeMngt.bswMAutoConfig(bswMCfg, "Service Discovery Control") {
+        modeMngt.bswMAutoConfig("Service Discovery Control") {
             for (rootFeature in rootFeatures) {
                 if (getIdentifier(rootFeature.identifier) == "/Client Services") {
                     for (subFeature in rootFeature.subFeatures) { // Get all Client Services
@@ -132,7 +132,7 @@ class ServiceDiscoveryControl extends EcuStateManagementDomain {
      */
     @Override
     void processDomainFeatures(EcuStateManagementModel model, OcsLogger logger, IModeManagementApi modeMngt, MIContainer bswMCfg) {
-        modeMngt.bswMAutoConfig(bswMCfg, "Service Discovery Control") { autoConfigApi ->
+        modeMngt.bswMAutoConfig("Service Discovery Control") { autoConfigApi ->
             // Loop over the rootFeatures, i. e. Client Services and Server Services
             for (rootFeature in rootFeatures) {
                 String service = getIdentifier(rootFeature.identifier)
