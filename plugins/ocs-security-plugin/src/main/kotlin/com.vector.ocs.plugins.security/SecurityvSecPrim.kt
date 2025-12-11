@@ -36,14 +36,13 @@
 package com.vector.ocs.plugins.security
 
 import com.vector.cfg.automation.api.ScriptApi
+import com.vector.cfg.model.pai.api.transaction
 import com.vector.ocs.core.api.OcsLogger
-import com.vector.ocs.interop.transactionApi
 import com.vector.ocs.lib.shared.HelperLib.getContainer
 import com.vector.ocs.lib.shared.HelperLib.getModule
 import com.vector.ocs.lib.shared.HelperLib.setParam
 
 private val project = ScriptApi.getActiveProject()
-private val transactionApi = project.transactionApi
 private val vSecPrimCfg = project.getModule("/MICROSAR/vSecPrim")
 
 /**
@@ -53,7 +52,7 @@ private val vSecPrimCfg = project.getModule("/MICROSAR/vSecPrim")
  */
 internal fun enableMacAlgo(algo: String, logger: OcsLogger) {
     val vSecPrimMacCfg = vSecPrimCfg.getContainer("vSecPrimSymmetricAlgorithms/vSecPrimMac")
-    transactionApi.transaction {
+    project.transaction {
         when (algo) {
             "Cmac" -> vSecPrimMacCfg?.setParam("vSecPrimCmacEnabled", true)
             "Gmac" -> vSecPrimMacCfg?.setParam("vSecPrimGMacEnabled", true)
