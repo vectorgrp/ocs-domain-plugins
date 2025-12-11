@@ -1,9 +1,1 @@
 apply from: rootProject.file('gradle/plugins.gradle')
-
-dvCfgAutomation {
-    useBswmdModel = false
-}
-
-dependencies {
-    implementation "com.vector.ocs:ocs-interop:$vOcsCore"
-}

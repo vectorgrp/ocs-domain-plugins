@@ -4,4 +4,4 @@
 /buildSrc/.gradle
 /buildSrc/build
 /plugins/*/build
-
+/_bswmd/build

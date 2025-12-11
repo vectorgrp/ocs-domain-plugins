@@ -1,0 +1,14 @@
+// Handle BSWMD dependencies
+
+scriptProject {
+    bswmd {
+        isActivated = true
+    }
+}
+
+afterEvaluate {
+    tasks.named('initBswmdModel').configure {
+        enabled = false
+        dependsOn project(':_bswmd').tasks.named('initBswmdModel')
+    }
+}
