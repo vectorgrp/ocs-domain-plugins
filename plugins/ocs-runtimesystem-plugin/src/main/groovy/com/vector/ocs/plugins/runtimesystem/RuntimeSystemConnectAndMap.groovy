@@ -71,24 +71,22 @@ import com.vector.cfg.automation.model.ecuc.microsar.rte.Rte
 import com.vector.cfg.automation.model.ecuc.microsar.secoc.SecOC
 import com.vector.cfg.automation.model.ecuc.microsar.vtt.vttos.VTTOs
 import com.vector.cfg.automation.scripting.api.project.IProject
-import com.vector.cfg.consistency.ui.ISolvingActionUI
-import com.vector.cfg.consistency.ui.IValidationResultUI
+import com.vector.cfg.consistency.requester.IValidationResultUI
+import com.vector.cfg.consistency.requester.solvingaction.ISolvingActionUI
 import com.vector.cfg.gen.core.bswmdmodel.GICList
 import com.vector.cfg.gen.core.bswmdmodel.GIOptional
 import com.vector.cfg.gen.core.bswmdmodel.GIPList
 import com.vector.cfg.gen.core.bswmdmodel.GIReferenceToContainer
-import com.vector.cfg.gen.core.bswmdmodel.param.GInstanceReference
-import com.vector.cfg.gen.core.genusage.groovy.api.IGenerationApi
-import com.vector.cfg.model.access.AsrPath
+import com.vector.cfg.gen.core.genusage.pai.api.IGenerationApi
 import com.vector.cfg.model.access.DefRef
-import com.vector.cfg.model.mdf.commoncore.autosar.MIReferrable
-import com.vector.cfg.model.mdf.commoncore.autosar.MIReferrableARRef
-import com.vector.cfg.model.mdf.model.autosar.base.MIARAnyInstanceRef
+import com.vector.cfg.model.mdf.ar4x.swcomponenttemplate.components.MIServiceSwComponentType
+import com.vector.cfg.model.mdf.ar4x.swcomponenttemplate.composition.MISwComponentPrototype
 import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIContainer
-import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIInstanceReferenceValue
 import com.vector.cfg.model.state.IParameterStatePublished
-import com.vector.cfg.model.sysdesc.api.taskmapping.IEvent
-import com.vector.cfg.model.sysdesc.api.taskmapping.ITaskMapping
+import com.vector.cfg.sysdesc.model.ISysDescService
+import com.vector.cfg.sysdesc.model.component.SIComponent
+import com.vector.cfg.sysdesc.model.internalbehavior.SIEvent
+import com.vector.cfg.sysdesc.model.taskmapping.SITaskMapping
 import com.vector.ocs.core.api.OcsLogger
 import com.vector.ocs.lib.shared.PluginsCommon
 import com.vector.ocs.plugins.runtimesystem.dataclasses.RtsApplication
@@ -96,7 +94,10 @@ import com.vector.ocs.plugins.runtimesystem.dataclasses.RtsCore
 import com.vector.ocs.plugins.runtimesystem.dataclasses.RtsDataModel
 import com.vector.ocs.plugins.runtimesystem.dataclasses.RtsTask
 import groovy.transform.PackageScope
+
+import java.util.regex.Matcher
 import java.util.regex.Pattern
+
 import static com.vector.cfg.automation.api.ScriptApi.activeProject
 
 @PackageScope
@@ -227,6 +228,12 @@ class RuntimeSystemConnectAndMap {
                         "cores in the OsPhysicalCores the processing of the RuntimeSystem in the RUN phase will not be continued.")
                 return
             }
+
+            /* Prepare Structured Extract (Needed before SWC instantiation. TAR-88479)*/
+            transaction {
+                projectContext.getService(ISysDescService.class).prepareStructuredExtractUsage()
+            }
+
             // 1. Before cleaning up the project, synchronize the System Description
             synchronizeSwcDescription(logger)
 
@@ -244,21 +251,20 @@ class RuntimeSystemConnectAndMap {
             handleInterruptMapping(model.interruptMapping.userDefinedMapping, model.interruptMapping.defaultIsrApplication, logger)
 
             // 4. Map runnables to tasks
-            logger.debug("Check that Rte module is available.")
-            Boolean isRtePresent = PluginsCommon.ConfigPresent(RuntimeSystemConstants.RTE_DEFREF)
-            if (isRtePresent) {
-                triggerRteSolvingActionForCreationOfMissingBswEventContainer(logger)
-            }
             handleTaskMapping(model.taskMapping.userDefinedMapping, model.taskMapping.defaultBswTask, model.cores, logger)
 
             // 5. Trigger RTE solving action to fix the runnable order
+            logger.debug("Check that Rte module is available.")
+            Boolean isRtePresent = PluginsCommon.ConfigPresent(RuntimeSystemConstants.RTE_DEFREF)
             if (isRtePresent) {
                 triggerRteSolvingActionForRunnableOrder(logger)
+            }
 
             // 6. Trigger calculation phase of the Rte to create additional Os configuration
             // Currently it is not clear if this operation could be also done in another context, e.g. individual file
             // which address the Rte configuration parts. Therefore for not it is kept here but the Rte.DefRef is not
             // directly used. instead the DefRef is created itself in the triggerRteCalculation()
+            if (isRtePresent) {
                 triggerRteCalculation(logger)
             }
 
@@ -314,7 +320,7 @@ class RuntimeSystemConnectAndMap {
             validation {
                 it.validationResults.each { validationResult ->
                     if (validationResult.getPreferredSolvingAction() != null) {
-                        if (validationResult.preferredSolvingAction.description.contains("Full SWC description build")) {
+                        if (validationResult.preferredSolvingAction.description.contains("Full Swc description build")) {
                             validationResult.preferredSolvingAction.solve()
                         }
                     }
@@ -537,7 +543,7 @@ class RuntimeSystemConnectAndMap {
 
             Os osCfg = bswmdModel(Os.DefRef).single()
             logger.debug("Check that Rte module is available.")
-            if(PluginsCommon.ConfigPresent(RuntimeSystemConstants.RTE_DEFREF)){
+            if (PluginsCommon.ConfigPresent(RuntimeSystemConstants.RTE_DEFREF)) {
                 Rte rteCfg = bswmdModel(Rte.DefRef).single()
                 if (PluginsCommon.ConfigPresent("/MICROSAR/SecOC")) {
                     SecOC secOCCfg = bswmdModel(SecOC.DefRef).single()
@@ -685,7 +691,7 @@ class RuntimeSystemConnectAndMap {
                     userDefinedTaskMapping.each { entry ->
                         try {
                             runtimeSystem {
-                                List<? extends ITaskMapping> taskMappings
+                                List<? extends SITaskMapping> taskMappings
                                 if (eventBased) {
                                     taskMappings = selectEvents {
                                         unmapped()
@@ -726,7 +732,7 @@ class RuntimeSystemConnectAndMap {
      */
     private static void mapEcuMMainFunctions(List<RtsCore> modelCores, OcsLogger logger) {
         def patternEcuM = RuntimeSystemConstants.patternEcuM
-        List<IEvent> selectedEcuMEvents = null
+        List<SIEvent> selectedEcuMEvents = null
         activeProject() { project ->
             transaction { transaction ->
                 domain { domain ->
@@ -741,7 +747,7 @@ class RuntimeSystemConnectAndMap {
                             moduleConfiguration(patternEcuM)
                         }.getEvents()
                     }
-                    selectedEcuMEvents.sort { it.name }
+                    selectedEcuMEvents = selectedEcuMEvents.toList().sort { it.name }
                     // get the BswTask of the QM Application of each core.
                     // iterate over each core
                     List<String> bswTasks = []
@@ -783,8 +789,8 @@ class RuntimeSystemConnectAndMap {
             transaction {
                 domain {
                     try {
-                        runtimeSystem { runtimeSystem ->
-                            List<? extends ITaskMapping> taskMappings = selectExecutableEntities {
+                        runtimeSystem { runtimeSystem1 ->
+                            List<? extends SITaskMapping> taskMappings = selectExecutableEntities {
                                 unmapped()
                                 bswSchedulableEntity()
                                 moduleConfiguration(pattern)
@@ -817,7 +823,7 @@ class RuntimeSystemConnectAndMap {
                 domain {
                     try {
                         runtimeSystem { runtimeSystem ->
-                            List<? extends ITaskMapping> taskMappings = selectEvents {
+                            List<? extends SITaskMapping> taskMappings = selectEvents {
                                 unmapped()
                                 bswEvent()
                             } mapToTask {
@@ -911,37 +917,6 @@ class RuntimeSystemConnectAndMap {
                             isId(RTE, 1068)
                         }.withAction {
                             logger.info("Trigger RTE1068 solving action.")
-                            solvingActions.first
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Trigger the following solving action of the RTE BSW module.<br>
-     * <ul>
-     *     <li>RTE1009</li>
-     * </ul>
-     * @param logger
-     */
-    private static void triggerRteSolvingActionForCreationOfMissingBswEventContainer(OcsLogger logger) {
-        activeProject() { IProject project ->
-            PluginsCommon.modelSynchronization(project, logger)
-            // Justify missing return statement because it could be the case that no solving action appears
-            //noinspection GroovyMissingReturnStatement
-            validation {
-                final String RTE = "RTE"
-                Collection<IValidationResultUI> rte1009Results = validationResults.findAll { IValidationResultUI iValidationResults ->
-                    iValidationResults.isId(RTE, 1009) && iValidationResults.isActive()
-                }
-                if (!rte1009Results.isEmpty()) {
-                    solver.solve {
-                        result {
-                            isId(RTE, 1009)
-                        }.withAction {
-                            logger.info("Trigger RTE1009 solving action.")
                             solvingActions.first
                         }
                     }
@@ -1046,24 +1021,18 @@ class RuntimeSystemConnectAndMap {
         //noinspection GroovyMissingReturnStatement
         activeProject() { IProject project ->
             PluginsCommon.modelSynchronization(project, logger)
-            AsrPath flatExtractPath = project.getSystemDescription().getPaths().getFlatCompositionTypePath()
-            MIReferrable flatExtractModel = project.mdfModel(flatExtractPath)
             EcuC ecuModule = bswmdModel(EcuC.DefRef).single
-
-            if (flatExtractModel != null){
-                triggerSwcInstanceMapping(defaultBswTask, flatExtractModel, logger)
-                mapCoresSwcInstance(ecuModule, flatExtractModel, cores, logger)
-            }
+            triggerSwcInstanceMapping(defaultBswTask, logger)
+            mapCoresSwcInstance(ecuModule, cores, logger)
         }
     }
 
     /**
-     * Trigger the mapping of the provided swc instance (via the module name) to the QM application of the master core.
+     * Trigger the mapping of the unmapped swc instances to the QM application of the master core.
      * @param defaultBswTask default bsw task from the model to get the correct partition.
-     * @param flatExtractModel PAI internal model to access the API to set the reference.
      * @param logger instance of the OcsLogger.
      */
-    private static void triggerSwcInstanceMapping(String defaultBswTask, MIReferrable flatExtractModel, OcsLogger logger) {
+    private static void triggerSwcInstanceMapping(String defaultBswTask, OcsLogger logger) {
         activeProject() {
             Os osModule = bswmdModel(Os.DefRef).single
             OsApplication application = osModule.osApplication.find { application ->
@@ -1077,21 +1046,24 @@ class RuntimeSystemConnectAndMap {
                     EcucPartition ecucPartition = ecucPartitionRef.refTarget
                     logger.info("Assign Service Components for $ecucPartition.shortname.")
                     if (ecucPartition != null) {
-                        RuntimeSystemConstants.swcInstances.each { swcInstance ->
-                            if (swcInstance == "Csm") {
-                                project.validation {
-                                    validationResults.each { IValidationResultUI iValidationResult ->
-                                        if (iValidationResult.id.origin == "RTE" &&
-                                                iValidationResult.id.id == 13009 &&
-                                                iValidationResult.isActive() &&
-                                                iValidationResult.description.toString().startsWith("Component <Csm> is not assigned to an OS Application")) {
-                                            mapSwcInstance(ecucPartition, flatExtractModel, swcInstance, logger)
-                                        }
+                        List<String> serviceComponentNames = []
+                        project.validation {
+                            validationResults.each { IValidationResultUI iValidationResult ->
+                                if (iValidationResult.id.origin == "RTE" &&
+                                        iValidationResult.id.id == 13009 &&
+                                        iValidationResult.isActive()) {
+                                    // Extract component name in the <XYZ> e.g.
+                                    // Component <Det> is not assigned to an OS Application.
+                                    Matcher matcher = iValidationResult.description.toString() =~ /<([^>]+)>/
+                                    String serviceComponent = matcher ? matcher[0][1] : null
+                                    if (serviceComponent != null) {
+                                        serviceComponentNames.add(serviceComponent)
                                     }
                                 }
-                            } else {
-                                mapSwcInstance(ecucPartition, flatExtractModel, swcInstance, logger)
                             }
+                        }
+                        if (!serviceComponentNames.isEmpty()) {
+                            mapSwcInstance(ecucPartition, serviceComponentNames, logger)
                         }
                     }
                 }
@@ -1102,18 +1074,18 @@ class RuntimeSystemConnectAndMap {
     /**
      * Map the provided swc instance to the corresponding QM application of the master core.
      * @param partition Partition to which the provided swc instance will get mapped. (Contains the QM Application)
-     * @param flatExtractModel PAI internal model to access the API to set the reference.
-     * @param moduleName name of the module whose swc instance shall be mapped.
+     * @param serviceComponentNames names of the swc instances that shall be mapped.
      * @param logger instance of the OcsLogger.
      */
-    private static void mapSwcInstance(EcucPartition partition, MIReferrable flatExtractModel, String moduleName, OcsLogger logger) {
-        MIReferrable serviceComponent = flatExtractModel.childByName(moduleName)
-        if (serviceComponent != null) {
-            if (partition != null) {
-                logger.info("Process Service Component $serviceComponent.name.")
-                boolean alreadyMapped = checkExistingSwcInstanceMapping(partition, serviceComponent)
-                if (!alreadyMapped) {
-                    createPartitionSwcInstanceRef(partition, serviceComponent, logger)
+    private static void mapSwcInstance(EcucPartition partition, List<String> serviceComponentNames, OcsLogger logger) {
+        activeProject {
+            sysDescModel.flatComponentView.each { swc ->
+                def type = (swc.mdfObject as MISwComponentPrototype).type?.refTarget
+                if (type instanceof MIServiceSwComponentType) {
+                    if (swc.mappedOsApplications.isEmpty() && serviceComponentNames.contains(type.name) && !type.name.contains("Core")) {
+                        logger.info("Process Service Component $type.name.")
+                        createPartitionSwcInstanceRef(partition, swc, logger)
+                    }
                 }
             }
         }
@@ -1122,56 +1094,35 @@ class RuntimeSystemConnectAndMap {
     /**
      * Map the core specific swc instances to the corresponding System applications of each core.
      * @param ecucModule Ecuc bsw module.
-     * @param flatExtractModel PAI internal model to access the API to set the reference.
      * @param cores list of modelled cores.
      * @param logger instance of the OcsLogger.
      */
-    private static void mapCoresSwcInstance(EcuC ecucModule, MIReferrable flatExtractModel, List<RtsCore> cores, OcsLogger logger) {
-        cores.each { currentCore ->
-            EcucPartition coreEcuCPartition = getEcucPartitionOfSystemApplication(ecucModule, currentCore, logger)
-            if (null != coreEcuCPartition) {
-                logger.info("Assign Service Component for $coreEcuCPartition.shortname.")
-                MIReferrable osServiceCmp = flatExtractModel.childByName("Os_" + currentCore.name + "_swc")
-                if (null != osServiceCmp) {
-                    logger.info("Process Service Component $osServiceCmp.name.")
-                    boolean osSwcIsMapped = checkExistingSwcInstanceMapping(coreEcuCPartition, osServiceCmp)
-                    if (!osSwcIsMapped) {
+    private static void mapCoresSwcInstance(EcuC ecucModule, List<RtsCore> cores, OcsLogger logger) {
+        activeProject {
+            cores.each { currentCore ->
+                EcucPartition coreEcuCPartition = getEcucPartitionOfSystemApplication(ecucModule, currentCore, logger)
+                if (null != coreEcuCPartition) {
+                    logger.info("Assign Service Component for $coreEcuCPartition.shortname.")
+                    SIComponent osServiceCmp = null
+                    sysDescModel.flatComponentView.each { swc ->
+                        def type = (swc.mdfObject as MISwComponentPrototype).type?.refTarget
+                        if (type instanceof MIServiceSwComponentType) {
+                            if (swc.mappedOsApplications.isEmpty() && type.name.contains("Os_" + currentCore.name + "_swc")) {
+                                osServiceCmp = swc
+                            }
+                        }
+                    }
+                    if (null != osServiceCmp) {
+                        logger.info("Process Service Component $osServiceCmp.name.")
                         createPartitionSwcInstanceRef(coreEcuCPartition, osServiceCmp, logger)
-                    }
-                } else {
-                    if (cores.size() > 1) {
-                        logger.error("Cannot find Service Component Os_${currentCore.name}_swc during Core SWC instance Mapping.")
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Check for an already existing mapping of the swc instance.
-     * @param partition ecuc partition which is checked for existing mappings.
-     * @param serviceComponent object for which a mapping is checked.
-     * @return Boolean if already mapped.
-     */
-    private static Boolean checkExistingSwcInstanceMapping(EcucPartition partition, MIReferrable serviceComponent) {
-        Boolean isMapped = false
-        partition.getEcucPartitionSoftwareComponentInstanceRef().each { GInstanceReference swCmpInsRefPtr ->
-            MIInstanceReferenceValue refValue = swCmpInsRefPtr.getMdfObject()
-            MIARAnyInstanceRef anyInstanceRef
-            MIReferrableARRef referableARRef
-            if (refValue != null) {
-                anyInstanceRef = refValue.getValue()
-                if (anyInstanceRef != null) {
-                    referableARRef = anyInstanceRef.getTarget()
-                    if (referableARRef != null &&
-                            referableARRef.getValue() == serviceComponent.getAsrPath().toString().
-                            substring("AsrPath: ".size())) {
-                        isMapped = true
+                    } else {
+                        if (cores.size() > 1) {
+                            logger.error("Cannot find Service Component Os_${currentCore.name}_swc during Core SWC instance Mapping.")
+                        }
                     }
                 }
             }
         }
-        return isMapped
     }
 
     /**
@@ -1180,15 +1131,13 @@ class RuntimeSystemConnectAndMap {
      * @param serviceComponent swc instance for which a mapping is added.
      * @param logger instance of the OcsLogger.
      */
-    private static void createPartitionSwcInstanceRef(EcucPartition partition, MIReferrable serviceComponent, OcsLogger logger) {
-        activeProject() { project ->
-            transaction {
-                GInstanceReference instanceRef = partition.getEcucPartitionSoftwareComponentInstanceRef().createAndAdd()
-                MIInstanceReferenceValue refValue = instanceRef.getMdfObject()
-                MIARAnyInstanceRef anyInstanceRef = refValue.getValue()
-                MIReferrableARRef referableARREf = anyInstanceRef.getTarget()
-                referableARREf.setValue(serviceComponent.getAsrPath())
-                logger.info("Mapped ${serviceComponent.name} to ${partition.shortname}.")
+    private static void createPartitionSwcInstanceRef(EcucPartition partition, SIComponent serviceComponent, OcsLogger logger) {
+        if (partition != null && serviceComponent != null) {
+            activeProject() { project ->
+                transaction {
+                    serviceComponent.assignViaEcuCPartitionInstanceRef(partition.mdfObject)
+                    logger.info("Mapped ${serviceComponent.name} to ${partition.shortname}.")
+                }
             }
         }
     }
@@ -1301,7 +1250,7 @@ class RuntimeSystemConnectAndMap {
      * @param coreName name of the OsCore for which the reference should be set.
      * @param logger instance of the OcsLogger.
      */
-     static void createOsCorePhysicalCoreRef(Os osModule, OsCore osCore, OcsLogger logger) {
+    static void createOsCorePhysicalCoreRef(Os osModule, OsCore osCore, OcsLogger logger) {
         String coreName = osCore?.shortname
         logger.info("Create OsCorePhysicalCoreRef for $coreName.")
         List<OsPhysicalCore> osPhysicalCoresReferenced = getReferencedOsPhysicalCores(osModule)
