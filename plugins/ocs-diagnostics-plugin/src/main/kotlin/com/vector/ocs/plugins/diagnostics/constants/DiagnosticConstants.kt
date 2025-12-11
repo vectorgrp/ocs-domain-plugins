@@ -50,8 +50,5 @@ class DiagnosticConstants {
 
         /** Threshold for status FAILED in the Debouncing algorithm TIMEBASED after PreFailed report (ms) */
         const val DEBOUNCE_TIME_FAILED_THRESHOLD: Float = 0.1f
-
-        /** Cfg5 version of R34 */
-        const val CFG5_VERSION_R34 = 31
     }
 }

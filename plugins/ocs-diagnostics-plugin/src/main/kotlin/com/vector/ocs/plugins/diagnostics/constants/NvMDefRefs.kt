@@ -35,8 +35,6 @@
  *********************************************************************************************************************/
 package com.vector.ocs.plugins.diagnostics.constants
 
-import com.vector.ocs.lib.shared.PluginsCommon
-
 abstract class NvMDefRefs {
 
     /** Name of the processing context */
@@ -77,29 +75,15 @@ abstract class NvMDefRefs {
         }
     }
 
-    open class NvMDefRefsR31 : NvMDefRefs() {
+    open class NvMDefRefsR35 : NvMDefRefs() {
         init {
-            minorVersion = 28
-        }
-    }
 
-    open class NvMDefRefsR34 : NvMDefRefs() {
-        init {
-            minorVersion = 31
         }
-    }
-
-    companion object {
-        var minorVersion = 28
     }
 
     object NvMDefRefConstantsFactory {
         fun getConstants(): NvMDefRefs {
-            return when {
-                PluginsCommon.Cfg5MinorVersion().toInt() >= 31 -> NvMDefRefsR34()
-                PluginsCommon.Cfg5MinorVersion().toInt() >= 28 -> NvMDefRefsR31()
-                else -> throw IllegalArgumentException("Unknown version: $minorVersion")
-            }
+            return NvMDefRefsR35()
         }
     }
 }

@@ -35,8 +35,6 @@
  *********************************************************************************************************************/
 package com.vector.ocs.plugins.diagnostics.constants
 
-import com.vector.ocs.lib.shared.PluginsCommon
-
 abstract class DemDefRefs {
     /** R31 */
     open val DEM: String = "/MICROSAR/Dem"
@@ -84,12 +82,13 @@ abstract class DemDefRefs {
             DEM_PRIMARY_MEMORY = "$DEM_EVENT_MEMORY_SET/DemPrimaryMemory"
             DEM_MAX_NUMBER_EVENT_ENTRY_PRIMARY = "$DEM_PRIMARY_MEMORY/DemMaxNumberEventEntryPrimary"
 
-            DEM_DEBOUNCE_ALGORITHM_CLASS = "$DEM_EVENT_CLASS/DemDebounceAlgorithmClass"
+            DEM_DEBOUNCE_ALGORITHM_CLASS = "$DEM_EVENT_PARAMETER/DemDebounceAlgorithmClass"
             DEM_DEBOUNCE_COUNTER_BASED = "$DEM_DEBOUNCE_ALGORITHM_CLASS/DemDebounceCounterBased"
             DEM_DEBOUNCE_MONITOR_INTERNAL = "$DEM_DEBOUNCE_ALGORITHM_CLASS/DemDebounceMonitorInternal"
             DEM_DEBOUNCE_TIME_BASE = "$DEM_DEBOUNCE_ALGORITHM_CLASS/DemDebounceTimeBase"
-            DEM_DEBOUNCE_TIME_PASSED_THRESHOLD = "$DEM_DEBOUNCE_TIME_BASE/DemDebounceTimePassedThreshold"
-            DEM_DEBOUNCE_TIME_FAILED_THRESHOLD = "$DEM_DEBOUNCE_TIME_BASE/DemDebounceTimeFailedThreshold"
+            DEM_DEBOUNCE_TIME_BASED_CLASS = "$DEM_CONFIG_SET/DemDebounceTimeBasedClass"
+            DEM_DEBOUNCE_TIME_PASSED_THRESHOLD = "$DEM_DEBOUNCE_TIME_BASED_CLASS/DemDebounceTimePassedThreshold"
+            DEM_DEBOUNCE_TIME_FAILED_THRESHOLD = "$DEM_DEBOUNCE_TIME_BASED_CLASS/DemDebounceTimeFailedThreshold"
 
             DEM_NV_RAM_BLOCK_ID = "$DEM_GENERAL/DemNvRamBlockId"
             DEM_NV_RAM_BLOCK_ID_REF = "$DEM_NV_RAM_BLOCK_ID/DemNvRamBlockIdRef"
@@ -99,37 +98,15 @@ abstract class DemDefRefs {
         }
     }
 
-    fun initR32() {
-        DEM_DEBOUNCE_ALGORITHM_CLASS = "$DEM_EVENT_PARAMETER/DemDebounceAlgorithmClass"
-        DEM_DEBOUNCE_COUNTER_BASED = "$DEM_DEBOUNCE_ALGORITHM_CLASS/DemDebounceCounterBased"
-        DEM_DEBOUNCE_MONITOR_INTERNAL = "$DEM_DEBOUNCE_ALGORITHM_CLASS/DemDebounceMonitorInternal"
-        DEM_DEBOUNCE_TIME_BASE = "$DEM_DEBOUNCE_ALGORITHM_CLASS/DemDebounceTimeBase"
-        DEM_DEBOUNCE_TIME_PASSED_THRESHOLD = "$DEM_DEBOUNCE_TIME_BASED_CLASS/DemDebounceTimePassedThreshold"
-        DEM_DEBOUNCE_TIME_FAILED_THRESHOLD = "$DEM_DEBOUNCE_TIME_BASED_CLASS/DemDebounceTimeFailedThreshold"
-        DEM_DEBOUNCE_TIME_BASED_CLASS = "$DEM_CONFIG_SET/DemDebounceTimeBasedClass"
-    }
-
-    open class DemDefRefsR31() : DemDefRefs() {
+    open class DemDefRefsR35() : DemDefRefs() {
         init {
 
         }
     }
-
-    open class DemDefRefsR32() : DemDefRefsR31() {
-        init {
-            initR32()
-        }
-    }
-
 
     object DemDefRefConstantsFactory {
         fun getConstants(): DemDefRefs {
-            val minorVersion = PluginsCommon.Cfg5MinorVersion()
-            return when {
-                minorVersion.toInt() == 28 -> DemDefRefsR31()
-                minorVersion.toInt() >= 29 -> DemDefRefsR32()
-                else -> throw IllegalArgumentException("Unknown version: $minorVersion")
-            }
+            return DemDefRefsR35()
         }
     }
 }
