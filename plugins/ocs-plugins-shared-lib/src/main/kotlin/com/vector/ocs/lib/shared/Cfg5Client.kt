@@ -60,7 +60,6 @@ import com.vector.ocs.lib.shared.HelperLib.getParameterList
 import com.vector.ocs.lib.shared.HelperLib.getValueInteger
 import com.vector.ocs.lib.shared.HelperLib.setParam
 
-
 @Suppress("unused")
 object Cfg5Client {
     private val project = ScriptApi.getActiveProject()
