@@ -51,14 +51,14 @@ Within the `ocs-domain-plugins` folder you can find the `gradle.properties` file
 #localSip=path/to/used/sip/external
 ocsRepo=../repository
 
-vOcsCore=1.7.0
-vPluginsCommon=1.5.0
-vOcsCom=1.8.0
-vOcsDiag=1.8.0
-vOcsNvM=1.8.0
-vOcsEcuState=1.8.0
-vOcsRuntime=1.8.0
-vOcsSecurity=1.6.0
+vOcsCore=1.7.1
+vPluginsCommon=1.5.1
+vOcsCom=1.8.1
+vOcsDiag=1.8.1
+vOcsNvM=1.8.1
+vOcsEcuState=1.8.1
+vOcsRuntime=1.8.1
+vOcsSecurity=1.6.1
 ```
 Based on the folder structure example above the explanation of the properties becomes easier. 
 Adapt the properties as following:
@@ -67,14 +67,14 @@ localSipStore=D:/dev/ocs/BswPackages
 localSip=MICROSAR_Classic_R31
 ocsRepo=../repository
 
-vOcsCore=1.7.0
-vPluginsCommon=my-company-1.5.0
-vOcsCom=my-company-1.8.0
-vOcsDiag=my-company-1.8.0
-vOcsNvM=my-company-1.8.0
-vOcsEcuState=my-company-1.8.0
-vOcsRuntime=my-company-1.8.0
-vOcsSecurity=my-company-1.6.0
+vOcsCore=1.7.1
+vPluginsCommon=my-company-1.5.1
+vOcsCom=my-company-1.8.1
+vOcsDiag=my-company-1.8.1
+vOcsNvM=my-company-1.8.1
+vOcsEcuState=my-company-1.8.1
+vOcsRuntime=my-company-1.8.1
+vOcsSecurity=my-company-1.6.1
 ```
 The `localSipStore` should point to the root directory of the BSW Packages while the `localSip` itself mentions a 
 dedicated BSW Package against which the source code will be compiled. The gradle project of the `ocs-custom-app` and
@@ -86,8 +86,8 @@ We kindly ask you to adapt the version information mentioned in the `gradle.prop
 that the plugins you build by yourself can be distinguished from those delivered as pre-build artifacts in the MICROSAR
 Automation SDK. Here an example for the resulting files:
 ```groovy
-ocs-communication-plugin-1.7.0.jar            // without adaptions
-ocs-communication-plugin-my-company-1.7.0.jar // with adaptions
+ocs-communication-plugin-1.7.1.jar            // without adaptions
+ocs-communication-plugin-my-company-1.7.1.jar // with adaptions
 ```
 
 ### Build the OCS Domain Plugins
@@ -124,14 +124,14 @@ file:
 #localSip=path/to/used/sip/
 ocsRepo=../repository
 
-vOcsCore=2.2.0
-vPluginsCommon=1.5.0
-vOcsCom=1.8.0
-vOcsDiag=1.8.0
-vOcsNvM=1.8.0
-vOcsEcuState=1.8.0
-vOcsRuntime=1.8.0
-vOcsSecurity=1.6.0
+vOcsCore=2.2.1
+vPluginsCommon=1.5.1
+vOcsCom=1.8.1
+vOcsDiag=1.8.1
+vOcsNvM=1.8.1
+vOcsEcuState=1.8.1
+vOcsRuntime=1.8.1
+vOcsSecurity=1.6.1
 ```
 The `localSipStore`, `localSip` and `ocsRepo` should be configured in the same way as for the `ocs-domain-plugins`.
 If you keep the other version numbers as stated in the file you would build the OCS Custom App based on the Vector
@@ -142,14 +142,14 @@ localSipStore=D:/dev/ocs/BswPackages
 localSip=MICROSAR_Classic_R31
 ocsRepo=../repository
 
-vOcsCore=1.7.0
-vPluginsCommon=my-company-1.5.0
-vOcsCom=my-company-1.8.0
-vOcsDiag=my-company-1.8.0
-vOcsNvM=my-company-1.8.0
-vOcsEcuState=my-company-1.8.0
-vOcsRuntime=my-company-1.8.0
-vOcsSecurity=my-company-1.6.0
+vOcsCore=1.7.1
+vPluginsCommon=my-company-1.5.1
+vOcsCom=my-company-1.8.1
+vOcsDiag=my-company-1.8.1
+vOcsNvM=my-company-1.8.1
+vOcsEcuState=my-company-1.8.1
+vOcsRuntime=my-company-1.8.1
+vOcsSecurity=my-company-1.6.1
 ```
 Please note that the gradle project of the OCS Custom App is prepared in a way that it handles the ocsRepo as well as
 the local maven repository.
@@ -180,6 +180,7 @@ Beside the mentioned dependencies the shared gradle project may point to additio
 | v1.6.0  | MICROSAR Automation SDK v1.5.0 | R31 - R34                          |
 | v1.7.0  | MICROSAR Automation SDK v1.6.0 | R31 - R34                          |
 | v1.8.0  | MICROSAR Automation SDK v1.7.0 | R31 - R34                          |
+| v1.8.1  | MICROSAR Automation SDK v1.7.1 | R31 - R34                          |
 
 ## Abbreviations
 | Abbreviation | Description                       |
