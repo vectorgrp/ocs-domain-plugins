@@ -46,14 +46,14 @@ Within the `ocs-domain-plugins` folder you can find the `gradle.properties` file
 ocsRepo=../repository
 #cfg6=path/to/davinci configurator/directory
 
-vOcsCore=3.1.0
-vPluginsCommon=2.2.0
-vOcsCom=2.2.0
-vOcsDiag=2.2.0
-vOcsNvM=2.2.0
-vOcsEcuState=2.2.0
-vOcsRuntime=2.2.0
-vOcsSecurity=2.2.0
+vOcsCore=3.1.1
+vPluginsCommon=2.2.1
+vOcsCom=2.2.1
+vOcsDiag=2.2.1
+vOcsNvM=2.2.1
+vOcsEcuState=2.2.1
+vOcsRuntime=2.2.1
+vOcsSecurity=2.2.1
 ```
 Based on the folder structure example above the explanation of the properties becomes easier. 
 Adapt the properties as following:
@@ -61,16 +61,16 @@ Adapt the properties as following:
 localSipStore=D:/dev/ocs/BswPackages
 localSip=MICROSAR_Classic_R35
 ocsRepo=../repository
-cfg6=<installation path of DaVinci Configurator Classic 6.2>
+cfg6=<installation path of DaVinci Configurator Classic 6.2.1>
 
-vOcsCore=3.1.0
-vPluginsCommon=my-company-2.2.0
-vOcsCom=my-company-2.2.0
-vOcsDiag=my-company-2.2.0
-vOcsNvM=my-company-2.2.0
-vOcsEcuState=my-company-2.2.0
-vOcsRuntime=my-company-2.2.0
-vOcsSecurity=my-company-2.2.0
+vOcsCore=3.1.1
+vPluginsCommon=my-company-2.2.1
+vOcsCom=my-company-2.2.1
+vOcsDiag=my-company-2.2.1
+vOcsNvM=my-company-2.2.1
+vOcsEcuState=my-company-2.2.1
+vOcsRuntime=my-company-2.2.1
+vOcsSecurity=my-company-2.2.1
 ```
 The `localSipStore` should point to the root directory of the BSW Packages while the `localSip` itself mentions a 
 dedicated BSW Package against which the source code will be compiled. The gradle project of the `ocs-custom-app` and
@@ -82,8 +82,8 @@ We kindly ask you to adapt the version information mentioned in the `gradle.prop
 that the plugins you build by yourself can be distinguished from those delivered as pre-build artifacts in the MICROSAR
 Automation SDK. Here an example for the resulting files:
 ```groovy
-ocs-communication-plugin-2.2.0.jar            // without adaptions
-ocs-communication-plugin-my-company-2.2.0.jar // with adaptions
+ocs-communication-plugin-2.2.1.jar            // without adaptions
+ocs-communication-plugin-my-company-2.2.1.jar // with adaptions
 ```
 
 ### Build the OCS Domain Plugins
@@ -108,7 +108,7 @@ above. Reason for this is a simple conceptional decision that this `repository` 
 delivered by Vector. In most cases, local maven repository which is used for the publication can be found under you
 Windows user account, for example:
 ```batch
-C:\Users\<your user account>\.m2\repository\com\vector\ocs\plugins\ocs-communication-plugin\my-company-2.2.0\ocs-communication-plugin-my-company-2.2.0.jar
+C:\Users\<your user account>\.m2\repository\com\vector\ocs\plugins\ocs-communication-plugin\my-company-2.2.1\ocs-communication-plugin-my-company-2.2.1.jar
 ```
 
 ## Building an OCS Custom App
@@ -121,14 +121,14 @@ file:
 ocsRepo=../repository
 #cfg6=path/to/davinci configurator/directory
 
-vOcsCore=3.1.0
-vPluginsCommon=2.2.0
-vOcsCom=2.2.0
-vOcsDiag=2.2.0
-vOcsNvM=2.2.0
-vOcsEcuState=2.2.0
-vOcsRuntime=2.2.0
-vOcsSecurity=2.2.0
+vOcsCore=3.1.1
+vPluginsCommon=2.2.1
+vOcsCom=2.2.1
+vOcsDiag=2.2.1
+vOcsNvM=2.2.1
+vOcsEcuState=2.2.1
+vOcsRuntime=2.2.1
+vOcsSecurity=2.2.1
 ```
 The `localSipStore`, `localSip` and `ocsRepo` should be configured in the same way as for the `ocs-domain-plugins`.
 If you keep the other version numbers as stated in the file you would build the OCS Custom App based on the Vector
@@ -138,16 +138,16 @@ properties, so that the result looks as follows:
 localSipStore=D:/dev/ocs/BswPackages
 localSip=MICROSAR_Classic_R35
 ocsRepo=../repository
-cfg6=<installation path of DaVinci Configurator Classic 6.2>
+cfg6=<installation path of DaVinci Configurator Classic 6.2.1>
 
-vOcsCore=3.1.0
-vPluginsCommon=my-company-2.2.0
-vOcsCom=my-company-2.2.0
-vOcsDiag=my-company-2.2.0
-vOcsNvM=my-company-2.2.0
-vOcsEcuState=my-company-2.2.0
-vOcsRuntime=my-company-2.2.0
-vOcsSecurity=my-company-2.2.0
+vOcsCore=3.1.1
+vPluginsCommon=my-company-2.2.1
+vOcsCom=my-company-2.2.1
+vOcsDiag=my-company-2.2.1
+vOcsNvM=my-company-2.2.1
+vOcsEcuState=my-company-2.2.1
+vOcsRuntime=my-company-2.2.1
+vOcsSecurity=my-company-2.2.1
 ```
 Please note that the gradle project of the OCS Custom App is prepared in a way that it handles the ocsRepo as well as
 the local maven repository.
@@ -178,7 +178,9 @@ Beside the mentioned dependencies the shared gradle project may point to additio
 | v1.6.0  | MICROSAR Automation SDK v1.5.0 | R31 - R34                          |
 | v1.7.0  | MICROSAR Automation SDK v1.6.0 | R31 - R34                          |
 | v1.8.0  | MICROSAR Automation SDK v1.7.0 | R31 - R34                          |
+| v1.8.1  | MICROSAR Automation SDK v1.7.1 | R31 - R34                          |
 | v2.2.0  | MICROSAR Automation SDK v2.0.0 | R35                                |
+| v2.2.1  | MICROSAR Automation SDK v2.0.1 | R35                                |
 
 ## Abbreviations
 | Abbreviation | Description                       |
