@@ -37,9 +37,6 @@ package com.vector.ocs.plugins.nvmemory
 
 import com.vector.cfg.automation.api.ScriptApi
 import com.vector.cfg.automation.model.ecuc.microsar.nvm.NvM
-import com.vector.cfg.gen.core.bswmdmodel.GIModuleConfiguration
-import com.vector.cfg.model.access.DefRef
-import com.vector.cfg.model.mdf.model.autosar.ecucdescription.MIModuleConfiguration
 import com.vector.ocs.lib.shared.PluginsCommon
 
 /**

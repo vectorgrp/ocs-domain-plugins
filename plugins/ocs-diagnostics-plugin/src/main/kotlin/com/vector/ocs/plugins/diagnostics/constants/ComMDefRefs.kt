@@ -35,8 +35,6 @@
  *********************************************************************************************************************/
 package com.vector.ocs.plugins.diagnostics.constants
 
-import com.vector.ocs.lib.shared.PluginsCommon
-
 /**
  * ComM def refs
  */
