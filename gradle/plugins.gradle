@@ -14,7 +14,6 @@ scriptProject {
 dependencies {
     implementation "com.vector.ocs:ocs-core-api:$vOcsCore"
     implementation "com.vector.ocs:ocs-json-api:$vOcsCore"
-    implementation "com.vector.ocs:ocs-sec:$vOcsCore"
 }
 
 // Define Groovy and kotlin structure as it is used in the individual plugin source folder
